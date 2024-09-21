@@ -70,13 +70,16 @@ class TimeSeriesDataset(Dataset):
         self.transform = transform
         self.sample_time_series = sample_time_series
         self.dataset_weight = dataset_weight
-
-        prob_path = os.path.join(os.path.dirname(__file__), 'data_prob_etth1.yaml')
-        with open(prob_path, 'r') as f:
-            data = yaml.safe_load(f)
-            series_prob = data[indexer.dataset_name]
-        self.weights = self._convert_to_weights(series_prob)
-        print(f"loaded prob from {prob_path}")
+        try:
+            prob_path = os.path.join(os.path.dirname(__file__), 'data_prob_etth1.yaml')
+            with open(prob_path, 'r') as f:
+                data = yaml.safe_load(f)
+                series_prob = data[indexer.dataset_name]
+            self.weights = self._convert_to_weights(series_prob)
+            print(f"loaded prob from {prob_path}")
+        except KeyError:
+            print(f"no prob found for {indexer.dataset_name}")
+            self.weights = np.ones(self.__len__())
 
         if sample_time_series == SampleTimeSeriesType.NONE:
             self.probabilities = None

@@ -1,5 +1,5 @@
-DEVICE=0
-export CUDA_VISIBLE_DEVICES=${DEVICE}
+# DEVICE=0
+# export CUDA_VISIBLE_DEVICES=${DEVICE}
 
 # take input arguments as DATASET
 DATASET=${1}

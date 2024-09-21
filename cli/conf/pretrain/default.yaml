@@ -13,9 +13,9 @@ compile: false  # set to mode: default, reduce-overhead, max-autotune
 ckpt_path: null  # set to "last" to resume training
 trainer:
   _target_: lightning.Trainer
-  accelerator: auto
-  strategy: auto
-  devices: auto
+  accelerator: cuda
+  devices: 4
+  strategy: ddp
   num_nodes: 1
   precision: 32
   logger:

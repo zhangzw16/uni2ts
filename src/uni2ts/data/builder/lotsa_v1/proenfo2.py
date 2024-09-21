@@ -319,7 +319,7 @@ def _get_covid19_energy_gen_func(proenfo_path: Path) -> tuple[GenFunc, Features]
     return gen_func, features
 
 
-class ProEnFoDatasetBuilder(LOTSADatasetBuilder):
+class ProEnFo2DatasetBuilder(LOTSADatasetBuilder):
     dataset_list = [
         "gfc12_load",
         "gfc14_load",
