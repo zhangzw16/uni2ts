@@ -26,6 +26,7 @@ search:
   job_template:
     name: "{experiment_name:s}_{dataset:s}"
     sku: 40G1-A100
+    identity: managed
     command:
       - sh scripts/run.sh {dataset}
     submit_args:
@@ -35,4 +36,4 @@ search:
   max_trials: 64
   params:
     - name: dataset
-      values: ['buildings_900k', 'buildings_bench', 'cloudops_tsf', 'cmip6', 'era5', 'gluonts', 'largest', 'lib_city', 'others', 'proenfo', 'subseasonal']
+      values: ["buildings_bench2", "era5", "proenfo2", "cmip6"]

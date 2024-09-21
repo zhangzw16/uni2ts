@@ -13,13 +13,19 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import yaml
+import os
+import torch
+import itertools
+
 from enum import Enum
-from typing import Any
+from typing import Any, Sequence, Iterator
 
 import numpy as np
 from torch.utils.data import Dataset
+from torch import Tensor
 
-from uni2ts.common.sampler import Sampler, get_sampler
+from uni2ts.common.sampler import Sampler, get_sampler, softmin
 from uni2ts.common.typing import (
     BatchedData,
     BatchedDateTime,
@@ -65,6 +71,13 @@ class TimeSeriesDataset(Dataset):
         self.sample_time_series = sample_time_series
         self.dataset_weight = dataset_weight
 
+        prob_path = os.path.join(os.path.dirname(__file__), 'data_prob_etth1.yaml')
+        with open(prob_path, 'r') as f:
+            data = yaml.safe_load(f)
+            series_prob = data[indexer.dataset_name]
+        self.weights = self._convert_to_weights(series_prob)
+        print(f"loaded prob from {prob_path}")
+
         if sample_time_series == SampleTimeSeriesType.NONE:
             self.probabilities = None
         elif sample_time_series == SampleTimeSeriesType.UNIFORM:
@@ -108,6 +121,15 @@ class TimeSeriesDataset(Dataset):
         Obtains time series from Indexer object
         """
         return self.indexer[idx % self.num_ts]
+    
+    def _convert_to_weights(self, series_prob: dict[str, float]) -> list[float]:
+        """
+        Convert series probabilities to weights
+        """
+        total_length = self.__len__()
+        one_cycle = [series_prob[key] for key in series_prob]
+        assert len(one_cycle) == self.num_ts, f"Number of series probabilities {len(one_cycle)} must match number of time series {self.num_ts}"
+        return (one_cycle * (total_length // len(one_cycle) + 1))[:total_length]
 
     @staticmethod
     def _flatten_data(data: dict[str, Data]) -> dict[str, FlattenedData]:
@@ -157,7 +179,9 @@ class MultiSampleTimeSeriesDataset(TimeSeriesDataset):
     def _get_data(self, idx: int) -> dict[str, BatchedData]:
         n_series = self.sampler(min(self.num_ts, self.max_ts))
         choices = np.concatenate([np.arange(idx), np.arange(idx + 1, self.num_ts)])
-        others = np.random.choice(choices, n_series - 1, replace=False)
+        relevant_weights = np.concatenate([self.weights[:idx], self.weights[idx+1:]])
+        probabilities = softmin(relevant_weights)
+        others = np.random.choice(choices, n_series - 1, replace=False, p=probabilities)
         samples = self.indexer[np.concatenate([[idx], others])]
         return samples
 

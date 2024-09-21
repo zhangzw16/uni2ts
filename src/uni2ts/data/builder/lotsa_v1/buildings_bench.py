@@ -108,6 +108,64 @@ class BuildingsBenchDatasetBuilder(LOTSADatasetBuilder):
         hf_dataset.save_to_disk(dataset_path=env.LOTSA_V1_PATH / dataset)
 
 
+class BuildingsBench2DatasetBuilder(LOTSADatasetBuilder):
+    dataset_list = [
+        "bdg-2_panther",
+        "bdg-2_fox",
+        "bdg-2_rat",
+        "bdg-2_bear",
+    ]
+    dataset_type_map = defaultdict(lambda: TimeSeriesDataset) | {
+        dataset: MultiSampleTimeSeriesDataset for dataset in MULTI_SAMPLE_DATASETS
+    }
+    dataset_load_func_map = defaultdict(lambda: partial(TimeSeriesDataset)) | {
+        dataset: partial(
+            MultiSampleTimeSeriesDataset,
+            max_ts=128,
+            combine_fields=("target", "past_feat_dynamic_real"),
+        )
+        for dataset in MULTI_SAMPLE_DATASETS
+    }
+
+    def build_dataset(self, dataset: str):
+        def gen_func() -> Generator[dict[str, Any], None, None]:
+            if dataset.startswith("bdg"):
+                pd_dataset = load_pandas_dataset(dataset.replace("_", ":"))
+            else:
+                pd_dataset = load_pandas_dataset(dataset)
+
+            for item_id, df in pd_dataset:
+                freq = df.index.freqstr
+                if freq is None:
+                    from pandas.tseries.frequencies import to_offset
+
+                    freq = to_offset(df.index[1] - df.index[0]).freqstr
+                    df = df.asfreq(freq)
+                    if df.power.isnull().sum() / len(df) > 0.5:
+                        continue
+                yield dict(
+                    item_id=item_id,
+                    start=df.index[0],
+                    target=df.power,
+                    freq=freq,
+                )
+
+        hf_dataset = datasets.Dataset.from_generator(
+            generator=gen_func,
+            features=Features(
+                dict(
+                    item_id=Value("string"),
+                    start=Value("timestamp[s]"),
+                    freq=Value("string"),
+                    target=Sequence(Value("float32")),
+                )
+            ),
+            cache_dir=env.HF_CACHE_PATH,
+        )
+        hf_dataset.info.dataset_name = dataset
+        hf_dataset.save_to_disk(dataset_path=env.LOTSA_V1_PATH / dataset)
+
+
 class Buildings900KDatasetBuilder(LOTSADatasetBuilder):
     dataset_list: list[str] = ["buildings_900k"]
     dataset_type_map = dict(buildings_900k=TimeSeriesDataset)

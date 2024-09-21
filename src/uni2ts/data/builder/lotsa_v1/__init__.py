@@ -15,6 +15,7 @@
 
 from ._base import LOTSADatasetBuilder
 from .buildings_bench import Buildings900KDatasetBuilder, BuildingsBenchDatasetBuilder
+from .buildings_bench import BuildingsBench2DatasetBuilder
 from .cloudops_tsf import CloudOpsTSFDatasetBuilder
 from .cmip6 import CMIP6DatasetBuilder
 from .era5 import ERA5DatasetBuilder
@@ -23,12 +24,14 @@ from .largest import LargeSTDatasetBuilder
 from .lib_city import LibCityDatasetBuilder
 from .others import OthersLOTSADatasetBuilder
 from .proenfo import ProEnFoDatasetBuilder
+from .proenfo2 import ProEnFo2DatasetBuilder
 from .subseasonal import SubseasonalDatasetBuilder
 
 __all__ = [
     "LOTSADatasetBuilder",
     "Buildings900KDatasetBuilder",
     "BuildingsBenchDatasetBuilder",
+    "BuildingsBench2DatasetBuilder",
     "CloudOpsTSFDatasetBuilder",
     "CMIP6DatasetBuilder",
     "ERA5DatasetBuilder",
@@ -37,5 +40,6 @@ __all__ = [
     "LibCityDatasetBuilder",
     "OthersLOTSADatasetBuilder",
     "ProEnFoDatasetBuilder",
+    "ProEnFo2DatasetBuilder",
     "SubseasonalDatasetBuilder",
 ]

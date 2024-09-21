@@ -53,3 +53,24 @@ def get_sampler(distribution: str, **kwargs) -> Sampler:
         return cast(Sampler, partial(beta_binomial_sampler, a=a, b=b))
     else:
         raise NotImplementedError(f"distribution {distribution} not implemented")
+
+
+def softmin(weights, temperature=1.0):
+    """
+    将距离转换为概率，使用Softmin函数。
+    
+    参数:
+    - weights: 距离列表
+    - temperature: 温度参数，控制平滑程度，默认值为1.0
+    
+    返回:
+    - probabilities: 转换后的概率列表
+    """
+    # 将weights转换为numpy数组
+    weights = np.array(weights)
+    
+    # 计算Softmin
+    exp_weights = np.exp(-weights / temperature)
+    probabilities = exp_weights / np.sum(exp_weights)
+    
+    return probabilities

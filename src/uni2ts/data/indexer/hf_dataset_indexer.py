@@ -32,13 +32,15 @@ class HuggingFaceDatasetIndexer(Indexer):
     Indexer for Hugging Face Datasets
     """
 
-    def __init__(self, dataset: Dataset, uniform: bool = False):
+    def __init__(self, dataset: Dataset, uniform: bool = False, dataset_name: str = None):
         """
         :param dataset: underlying Hugging Face Dataset
         :param uniform: whether the underlying data has uniform length
         """
         super().__init__(uniform=uniform)
         self.dataset = dataset
+        self.dataset_name = dataset_name
+            
         self.features = dict(self.dataset.features)
         self.non_seq_cols = [
             name

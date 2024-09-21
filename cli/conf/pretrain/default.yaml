@@ -1,6 +1,6 @@
 hydra:
   run:
-    dir: /data/Blob_EastUS/v-zhenwzhang/log/moirai_pretrain/${hydra:runtime.choices.model}/${hydra:runtime.choices.data}/${run_name}
+    dir: /data/Blob_EastUS/v-zhenwzhang/log/moirai_pretrain_prob/${hydra:runtime.choices.model}/${hydra:runtime.choices.data}/${run_name}
 defaults:
   - model: ???
   - data: ???
@@ -70,5 +70,5 @@ train_dataloader:
   drop_last: true
   fill_last: false
   worker_init_fn: null
-  prefetch_factor: 2
+  prefetch_factor: 4
   persistent_workers: true

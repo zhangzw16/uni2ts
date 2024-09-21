@@ -1,4 +1,4 @@
-description: moirai small pretrain losta_v1
+description: moirai small pretrain buildings_bench2_prob_etth1
 
 target:
   service: sing
@@ -23,11 +23,11 @@ storage:
     mount_dir: /data/Blob_EastUS
 
 jobs:
-- name: moirai_pretrain_all
+- name: moirai_pretrain buildings_bench2_prob_etth1
   sku: 40G1-A100
   identity: managed 
   submit_args:
     env:
       _AZUREML_SINGULARITY_JOB_UAI: "/subscriptions/e033d461-1923-44a7-872b-78f1d35a86dd/resourcegroups/Shun/providers/Microsoft.ManagedIdentity/userAssignedIdentities/epeastus_mi" 
   command:
-  - sh scripts/pretrain_all.sh
+  - sh scripts/run.sh buildings_bench2_prob_etth1
