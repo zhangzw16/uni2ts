@@ -15,7 +15,7 @@
                 "-cp", "conf/pretrain",
                 "run_name=debug",
                 "model=moirai_small",
-                "data=buildings_bench2_uni"
+                "data=proenfo2"
             ],
         }
     ]

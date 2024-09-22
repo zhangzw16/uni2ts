@@ -18,6 +18,7 @@ from typing import Callable, Optional
 import itertools
 
 import numpy as np
+import os
 
 import hydra
 import lightning as L
@@ -26,6 +27,7 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig
 from torch.utils._pytree import tree_map
 from torch.utils.data import Dataset, DistributedSampler, WeightedRandomSampler
+from dotenv import load_dotenv
 
 from uni2ts.common import hydra_util  # noqa: hydra resolvers
 from uni2ts.data.loader import DataLoader
@@ -155,4 +157,6 @@ def main(cfg: DictConfig):
 
 
 if __name__ == "__main__":
+    load_dotenv()
+    print("HF_DATASETS_IN_MEMORY_MAX_SIZE: ", os.getenv("HF_DATASETS_IN_MEMORY_MAX_SIZE"))
     main()

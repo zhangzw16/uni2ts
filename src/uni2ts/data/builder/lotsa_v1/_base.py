@@ -77,7 +77,7 @@ class LOTSADatasetBuilder(DatasetBuilder, abc.ABC):
         datasets = [
             self.dataset_load_func_map[dataset](
                 HuggingFaceDatasetIndexer(
-                    load_from_disk(self.storage_path / dataset), 
+                    load_from_disk(self.storage_path / dataset, keep_in_memory=False), 
                     uniform=self.uniform,
                     dataset_name=dataset
                 ),
