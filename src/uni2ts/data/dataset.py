@@ -70,6 +70,7 @@ class TimeSeriesDataset(Dataset):
         self.transform = transform
         self.sample_time_series = sample_time_series
         self.dataset_weight = dataset_weight
+        print("Dataset: ", indexer.dataset_name, " Weight: ", dataset_weight)
         try:
             prob_path = os.path.join(os.path.dirname(__file__), 'data_prob_etth1.yaml')
             with open(prob_path, 'r') as f:
@@ -182,9 +183,10 @@ class MultiSampleTimeSeriesDataset(TimeSeriesDataset):
     def _get_data(self, idx: int) -> dict[str, BatchedData]:
         n_series = self.sampler(min(self.num_ts, self.max_ts))
         choices = np.concatenate([np.arange(idx), np.arange(idx + 1, self.num_ts)])
-        relevant_weights = np.concatenate([self.weights[:idx], self.weights[idx+1:]])
-        probabilities = softmin(relevant_weights)
-        others = np.random.choice(choices, n_series - 1, replace=False, p=probabilities)
+        # relevant_weights = np.concatenate([self.weights[:idx], self.weights[idx+1:]])
+        # probabilities = softmin(relevant_weights)
+        # others = np.random.choice(choices, n_series - 1, replace=False, p=probabilities)
+        others = np.random.choice(choices, n_series - 1, replace=False)
         samples = self.indexer[np.concatenate([[idx], others])]
         return samples
 
