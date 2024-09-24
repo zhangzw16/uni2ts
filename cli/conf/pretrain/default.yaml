@@ -14,8 +14,8 @@ ckpt_path: null  # set to "last" to resume training
 trainer:
   _target_: lightning.Trainer
   accelerator: cuda
-  devices: 1
-  strategy: auto
+  devices: 4
+  strategy: ddp
   num_nodes: 1
   precision: 32
   logger:

@@ -70,6 +70,8 @@ def get_dataset_embeddings(dataset: Dataset) -> np.ndarray:
         start_time = pd.Timestamp(data["start"].item())
         target = data["target"][0] if isinstance(data["target"], list) else data["target"]
         freq = data["freq"][0] if isinstance(data["freq"], list) else data["freq"]
+        freq = "M" if freq == "MS" else freq
+        
         list_dataset = ListDataset(
             [{
                 "start": start_time, 
@@ -150,7 +152,9 @@ def main(cfg: DictConfig):
     train_dataset: Dataset = instantiate(cfg.data).load_dataset(
         defaultdict(lambda: Identity)
     )
+    global SAVE_PATH
     train_dataset_name = cfg.data._target_.split('.')[-1]
+    SAVE_PATH = os.path.join(SAVE_PATH, train_dataset_name)
 
     global TARGET_DATASET
     target_dataset: Dataset = SimpleDatasetBuilder(TARGET_DATASET).load_dataset(
@@ -160,7 +164,6 @@ def main(cfg: DictConfig):
 
     weights = get_all_weights(train_dataset, target_dataset)
 
-    global SAVE_PATH
     if not os.path.exists(SAVE_PATH):
         os.makedirs(SAVE_PATH)
     with open(os.path.join(SAVE_PATH, f"{train_dataset_name}_to_{TARGET_DATASET}_weights.json"), "w") as f:

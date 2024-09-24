@@ -58,25 +58,25 @@ class DataModule(L.LightningDataModule):
         batch_size: int,
         num_batches_per_epoch: Optional[int] = None,
     ) -> DataLoader:
-        try:
-            weights = list(itertools.chain.from_iterable(d.weights for d in dataset.datasets))
-            weights = softmin(weights)
-            sampler = WeightedRandomSampler(weights, batch_size)
-        except AttributeError:
-            sampler = None
+        # try:
+        #     weights = list(itertools.chain.from_iterable(d.weights for d in dataset.datasets))
+        #     weights = softmin(weights)
+        #     sampler = WeightedRandomSampler(weights, batch_size)
+        # except AttributeError:
+        #     sampler = None
 
-        # sampler = (
-        #     DistributedSampler(
-        #         dataset,
-        #         num_replicas=None,
-        #         rank=None,
-        #         shuffle=shuffle,
-        #         seed=0,
-        #         drop_last=False,
-        #     )
-        #     if world_size > 1
-        #     else None
-        # )
+        sampler = (
+            DistributedSampler(
+                dataset,
+                num_replicas=None,
+                rank=None,
+                shuffle=shuffle,
+                seed=0,
+                drop_last=False,
+            )
+            if world_size > 1
+            else None
+        )
         return dataloader_func(
             dataset=dataset,
             shuffle=shuffle if sampler is None else None,
