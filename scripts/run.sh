@@ -3,9 +3,10 @@
 
 # take input arguments as DATASET
 DATASET=${1}
+NAME=${2}
 
 python -m cli.train \
   -cp conf/pretrain \
-  run_name=${DATASET} \
+  run_name=${NAME} \
   model=moirai_small \
   data=${DATASET}
