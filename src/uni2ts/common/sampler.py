@@ -70,7 +70,7 @@ def softmin(weights, temperature=1.0):
     weights = np.array(weights)
     
     # 计算Softmin
-    exp_weights = np.exp(-weights / temperature)
+    exp_weights = np.exp(-weights * temperature)
     probabilities = exp_weights / np.sum(exp_weights)
     
     return probabilities

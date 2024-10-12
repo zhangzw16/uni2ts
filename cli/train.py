@@ -26,7 +26,7 @@ import torch
 from hydra.utils import instantiate
 from omegaconf import DictConfig
 from torch.utils._pytree import tree_map
-from torch.utils.data import Dataset, DistributedSampler, WeightedRandomSampler
+from torch.utils.data import Dataset, DistributedSampler, WeightedRandomSampler, ConcatDataset
 from dotenv import load_dotenv
 
 from uni2ts.common import hydra_util  # noqa: hydra resolvers
@@ -58,25 +58,37 @@ class DataModule(L.LightningDataModule):
         batch_size: int,
         num_batches_per_epoch: Optional[int] = None,
     ) -> DataLoader:
-        # try:
-        #     weights = list(itertools.chain.from_iterable(d.weights for d in dataset.datasets))
-        #     weights = softmin(weights)
-        #     sampler = WeightedRandomSampler(weights, batch_size)
-        # except AttributeError:
-        #     sampler = None
+        try:
+            weights = []
+            for sub_dataset in dataset.datasets:
+                print(sub_dataset)
+                if isinstance(sub_dataset, ConcatDataset):
+                    weights.extend(list(itertools.chain.from_iterable(d.weights for d in sub_dataset.datasets)))
+                else:
+                    weights.extend(list(sub_dataset.weights))
+            # weights = list(itertools.chain.from_iterable(d.weights for d in dataset.datasets))
+            weights = softmin(weights, temperature=0.6)
+            print("weights len: ", len(weights))
+            print("dataset len: ", len(dataset))
 
-        sampler = (
-            DistributedSampler(
-                dataset,
-                num_replicas=None,
-                rank=None,
-                shuffle=shuffle,
-                seed=0,
-                drop_last=False,
+            sampler = WeightedRandomSampler(weights, batch_size)
+            print("Using WeightedRandomSampler with weights length: ", len(weights))
+        except AttributeError:
+            print("No weights found, using DistributedSampler")
+            sampler = (
+                DistributedSampler(
+                    dataset,
+                    num_replicas=None,
+                    rank=None,
+                    shuffle=shuffle,
+                    seed=0,
+                    drop_last=False,
+                )
+                if world_size > 1
+                else None
             )
-            if world_size > 1
-            else None
-        )
+        
+        
         return dataloader_func(
             dataset=dataset,
             shuffle=shuffle if sampler is None else None,

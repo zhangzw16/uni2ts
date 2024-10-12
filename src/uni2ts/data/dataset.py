@@ -25,7 +25,8 @@ import numpy as np
 from torch.utils.data import Dataset
 from torch import Tensor
 
-from uni2ts.common.sampler import Sampler, get_sampler, softmin
+from uni2ts.common.env import env
+from uni2ts.common.sampler import Sampler, get_sampler
 from uni2ts.common.typing import (
     BatchedData,
     BatchedDateTime,
@@ -53,6 +54,9 @@ class SampleTimeSeriesType(Enum):
 
 
 class TimeSeriesDataset(Dataset):
+    # Class variable to cache the YAML data
+    _yaml_data_cache = None
+    
     def __init__(
         self,
         indexer: Indexer[dict[str, Any]],
@@ -70,17 +74,26 @@ class TimeSeriesDataset(Dataset):
         self.transform = transform
         self.sample_time_series = sample_time_series
         self.dataset_weight = dataset_weight
-        print("Dataset: ", indexer.dataset_name, " Weight: ", dataset_weight)
+        
+        # Load the YAML file only once
+        if TimeSeriesDataset._yaml_data_cache is None:
+            try:
+                prob_path = env.LOTSA_V1_DISTANCES_FILE
+                with open(prob_path, 'r') as f:
+                    TimeSeriesDataset._yaml_data_cache = yaml.safe_load(f)
+                print(f"Loaded YAML data from {prob_path}")
+            except Exception as e:
+                print(f"Error loading YAML file: {e}")
+                TimeSeriesDataset._yaml_data_cache = {}
+        data = TimeSeriesDataset._yaml_data_cache
+
         try:
-            prob_path = os.path.join(os.path.dirname(__file__), 'data_prob_etth1.yaml')
-            with open(prob_path, 'r') as f:
-                data = yaml.safe_load(f)
-                series_prob = data[indexer.dataset_name]
-            self.weights = self._convert_to_weights(series_prob)
-            print(f"loaded prob from {prob_path}")
+            series_prob = data[indexer.dataset_name]
+            self.weights = self._convert_to_cycle(series_prob)
+            print(f"Loaded distances for {indexer.dataset_name}")
         except KeyError:
-            print(f"no prob found for {indexer.dataset_name}")
-            self.weights = np.ones(self.__len__())
+            print(f"No probability found for {indexer.dataset_name}")
+            self.weights = np.ones(len(self)) * 0.42  # Adjust as needed
 
         if sample_time_series == SampleTimeSeriesType.NONE:
             self.probabilities = None
@@ -90,6 +103,8 @@ class TimeSeriesDataset(Dataset):
             self.probabilities = indexer.get_proportional_probabilities()
         else:
             raise ValueError(f"Unknown sample type {sample_time_series}")
+
+        print("Loaded dataset: ", indexer.dataset_name, " with weight: ", dataset_weight)
 
     def __getitem__(self, idx: int) -> dict[str, FlattenedData]:
         """
@@ -126,7 +141,7 @@ class TimeSeriesDataset(Dataset):
         """
         return self.indexer[idx % self.num_ts]
     
-    def _convert_to_weights(self, series_prob: dict[str, float]) -> list[float]:
+    def _convert_to_cycle(self, series_prob: dict[str, float]) -> list[float]:
         """
         Convert series probabilities to weights
         """
