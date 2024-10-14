@@ -13,19 +13,75 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import itertools
+import os
 from functools import partial
-from typing import Callable, Optional
+from typing import Callable, Optional, Any
 
 import hydra
 import lightning as L
+import numpy as np
 import torch
+from dotenv import load_dotenv
 from hydra.utils import instantiate
 from omegaconf import DictConfig
+from lightning.pytorch import Callback
 from torch.utils._pytree import tree_map
-from torch.utils.data import Dataset, DistributedSampler
+from torch.utils.data import (
+    ConcatDataset,
+    Dataset,
+    DistributedSampler,
+    WeightedRandomSampler,
+)
 
 from uni2ts.common import hydra_util  # noqa: hydra resolvers
+from uni2ts.common.sampler import softmin
 from uni2ts.data.loader import DataLoader
+
+class DynamicWeightUpdateCallback(Callback):
+    def __init__(self, dataset, temperature_schedule=None):
+        """
+        :param distances: distance to target dataset
+        :param temperature_schedule: function that takes epoch and returns temperature
+        """
+        super().__init__()
+        self.distances = self.get_weights(dataset)
+        if temperature_schedule is None:
+            def temperature_schedule(epoch):
+                return max(0.0, 1.0 - 0.002 * epoch)
+        self.temperature_schedule = temperature_schedule
+
+    def on_train_epoch_start(self, trainer: L.Trainer, *args: Any, **kwargs: Any):
+        """每个epoch开始时更新 sampler 的权重"""
+        current_epoch = trainer.current_epoch
+        new_weights = self.update_weights(current_epoch)
+        
+        # 获取训练数据加载器
+        train_dataloader = trainer.train_dataloader
+        sampler = train_dataloader.dataloader.sampler
+
+        # 更新 sampler 的权重
+        if isinstance(sampler, torch.utils.data.WeightedRandomSampler):
+            sampler.weights = torch.tensor(new_weights)
+            print(f"Epoch {current_epoch}: Updated sampler weights")
+
+    def update_weights(self, epoch):
+        """根据当前 epoch 动态计算新的权重"""
+        # 这里假设使用温度衰减来调整权重，温度随 epoch 增加而变化
+        temperature = self.temperature_schedule(epoch)
+        new_weights = softmin(self.distances, temperature=temperature)
+        return new_weights
+
+    @staticmethod
+    def get_weights(dataset):
+        weights = []
+        for sub_dataset in dataset.datasets:
+            print(sub_dataset)
+            if isinstance(sub_dataset, ConcatDataset):
+                weights.extend(list(itertools.chain.from_iterable(d.weights for d in sub_dataset.datasets)))
+            else:
+                weights.extend(list(sub_dataset.weights))
+        return weights
 
 
 class DataModule(L.LightningDataModule):
@@ -43,8 +99,8 @@ class DataModule(L.LightningDataModule):
             self.val_dataset = val_dataset
             self.val_dataloader = self._val_dataloader
 
-    @staticmethod
     def get_dataloader(
+        self,
         dataset: Dataset,
         dataloader_func: Callable[..., DataLoader],
         shuffle: bool,
@@ -52,18 +108,37 @@ class DataModule(L.LightningDataModule):
         batch_size: int,
         num_batches_per_epoch: Optional[int] = None,
     ) -> DataLoader:
-        sampler = (
-            DistributedSampler(
-                dataset,
-                num_replicas=None,
-                rank=None,
-                shuffle=shuffle,
-                seed=0,
-                drop_last=False,
+        try:
+            weights = []
+            for sub_dataset in dataset.datasets:
+                print(sub_dataset)
+                if isinstance(sub_dataset, ConcatDataset):
+                    weights.extend(list(itertools.chain.from_iterable(d.weights for d in sub_dataset.datasets)))
+                else:
+                    weights.extend(list(sub_dataset.weights))
+            self.distances = weights
+            # weights = list(itertools.chain.from_iterable(d.weights for d in dataset.datasets))
+            weights = softmin(weights, temperature=0.6)
+            print("weights len: ", len(weights))
+            print("dataset len: ", len(dataset))
+
+            sampler = WeightedRandomSampler(weights, batch_size)
+            print("Using WeightedRandomSampler with weights length: ", len(weights))
+        except AttributeError:
+            print("No weights found, using DistributedSampler")
+            sampler = (
+                DistributedSampler(
+                    dataset,
+                    num_replicas=None,
+                    rank=None,
+                    shuffle=shuffle,
+                    seed=0,
+                    drop_last=False,
+                )
+                if world_size > 1
+                else None
             )
-            if world_size > 1
-            else None
-        )
+        
         return dataloader_func(
             dataset=dataset,
             shuffle=shuffle if sampler is None else None,
@@ -115,8 +190,10 @@ class DataModule(L.LightningDataModule):
         )
 
 
-@hydra.main(version_base="1.3", config_name="default.yaml")
+@hydra.main(version_base="1.3", config_name="varying_weights.yaml")
 def main(cfg: DictConfig):
+    cfg = cfg._set_flag("allow_objects", True) # for callbacks.1 interpolation
+    
     if cfg.tf32:
         assert cfg.trainer.precision == 32
         torch.backends.cuda.matmul.allow_tf32 = True
@@ -139,6 +216,14 @@ def main(cfg: DictConfig):
         else None
     )
     L.seed_everything(cfg.seed + trainer.logger.version, workers=True)
+    # set weights update callback
+    # if cfg.dynamic_weight_update:
+    trainer.callbacks.append(
+        DynamicWeightUpdateCallback(
+            dataset=train_dataset
+        )
+    )
+
     trainer.fit(
         model,
         datamodule=DataModule(cfg, train_dataset, val_dataset),
@@ -147,4 +232,6 @@ def main(cfg: DictConfig):
 
 
 if __name__ == "__main__":
+    load_dotenv()
+    print("HF_DATASETS_IN_MEMORY_MAX_SIZE: ", os.getenv("HF_DATASETS_IN_MEMORY_MAX_SIZE"))
     main()

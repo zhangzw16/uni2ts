@@ -8,14 +8,14 @@
             "name": "Python: Run CLI Train",
             "type": "debugpy",
             "request": "launch",
-            "module": "cli.train",
+            "module": "cli.train_weights",
             "console": "integratedTerminal",
             "justMyCode": false,
             "args": [
                 "-cp", "conf/pretrain",
                 "run_name=debug",
                 "model=moirai_small",
-                "data=lotsa_v1_weighted_etth1_uni_debug"
+                "data=lotsa_v1_weighted_debug",
             ],
         }
     ]

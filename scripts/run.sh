@@ -5,7 +5,7 @@
 DATASET=${1}
 NAME=${2}
 
-python -m cli.train \
+python -m cli.train_weights \
   -cp conf/pretrain \
   run_name=${NAME} \
   model=moirai_small \
