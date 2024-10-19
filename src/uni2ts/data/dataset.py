@@ -76,18 +76,20 @@ class TimeSeriesDataset(Dataset):
         self.dataset_weight = dataset_weight
         
         # Load the YAML file only once
-        if TimeSeriesDataset._yaml_data_cache is None:
-            try:
-                prob_path = env.LOTSA_V1_DISTANCES_FILE
-                with open(prob_path, 'r') as f:
-                    TimeSeriesDataset._yaml_data_cache = yaml.safe_load(f)
-                print(f"Loaded YAML data from {prob_path}")
-            except Exception as e:
-                print(f"Error loading YAML file: {e}")
-                TimeSeriesDataset._yaml_data_cache = {}
+        # if TimeSeriesDataset._yaml_data_cache is None:
+        #     try:
+        #         prob_path = env.LOTSA_V1_DISTANCES_FILE
+        #         with open(prob_path, 'r') as f:
+        #             TimeSeriesDataset._yaml_data_cache = yaml.safe_load(f)
+        #         print(f"Loaded YAML data from {prob_path}")
+        #     except Exception as e:
+        #         print(f"Error loading YAML file: {e}")
+        #         TimeSeriesDataset._yaml_data_cache = {}
         data = TimeSeriesDataset._yaml_data_cache
 
         try:
+            if data is None:
+                raise KeyError
             series_prob = data[indexer.dataset_name]
             self.weights = self._convert_to_cycle(series_prob)
             print(f"Loaded distances for {indexer.dataset_name}")

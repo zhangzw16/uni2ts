@@ -26,10 +26,10 @@ val_metric:
   - _target_: uni2ts.loss.packed.PackedMSELoss
   - _target_: uni2ts.loss.packed.PackedNRMSELoss
     normalize: absolute_target_squared
-lr: 1e-3
+lr: 1e-5
 weight_decay: 1e-1
 beta1: 0.9
 beta2: 0.98
 num_training_steps: ${mul:${trainer.max_epochs},${train_dataloader.num_batches_per_epoch}}
 num_warmup_steps: 0
-checkpoint_path: ...
+checkpoint_path: /data/Blob_EastUS/v-zhenwzhang/log/moirai_pretrain/moirai_small/lotsa_v1_weighted/lotsa_v1_weighted/checkpoints/epoch=999-step=100000.ckpt

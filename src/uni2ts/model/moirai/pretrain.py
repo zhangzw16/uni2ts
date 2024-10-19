@@ -341,10 +341,11 @@ class MoiraiPretrain(L.LightningModule):
             eps=1e-6,
         )
         scheduler = get_scheduler(
-            SchedulerType.COSINE_WITH_RESTARTS,
+            # SchedulerType.COSINE_WITH_RESTARTS,
+            SchedulerType.CONSTANT_WITH_WARMUP,
             optimizer,
             num_warmup_steps=self.hparams.num_warmup_steps,
-            num_training_steps=self.hparams.num_training_steps,
+            # num_training_steps=self.hparams.num_training_steps,
         )
         return {
             "optimizer": optimizer,

@@ -1,9 +1,9 @@
 _target_: uni2ts.data.builder.ConcatDatasetBuilder
 _args_:
   _target_: uni2ts.data.builder.simple.generate_eval_builders
-  dataset: ETTh1_eval
-  offset: 11520
-  eval_length: 2880
+  dataset: Exchange_eval
+  offset: 6070
+  eval_length: 1520
   prediction_lengths: [96]
   context_lengths: [96]
   patch_sizes: [8, 16, 32]

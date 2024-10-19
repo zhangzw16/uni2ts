@@ -48,7 +48,12 @@ class DynamicWeightUpdateCallback(Callback):
         self.distances = self.get_weights(dataset)
         if temperature_schedule is None:
             def temperature_schedule(epoch):
-                return max(0.0, 1.0 - 0.002 * epoch)
+                if epoch < 400:
+                    return 0.0
+                elif 400 <= epoch < 800:
+                    return (epoch - 400) / 400.0
+                else:
+                    return 1.0
         self.temperature_schedule = temperature_schedule
 
     def on_train_epoch_start(self, trainer: L.Trainer, *args: Any, **kwargs: Any):
