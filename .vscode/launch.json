@@ -17,6 +17,20 @@
                 "model=moirai_small",
                 "data=lotsa_v1_weighted_debug",
             ],
+        },
+        {
+            "name": "Python: Run CLI get_weights",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "cli.get_weights",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "-cp", "conf/pretrain",
+                "run_name=debug",
+                "model=moirai_small",
+                "data=buildings_bench",
+            ],
         }
     ]
 }

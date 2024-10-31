@@ -1,0 +1,43 @@
+_target_: uni2ts.data.builder.ConcatDatasetBuilder
+_args_:
+  - _target_: uni2ts.data.builder.lotsa_v1.GluonTSDatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      car_parts_with_missing: 0.1783895467177555
+      cif_2016_12: 0.4574893413575907
+      cif_2016_6: 0.19302663773049444
+      covid_deaths: 0.8324845513495257
+      covid_mobility: 1.8776769670882492
+      hospital: 0.3293345477866256
+      kaggle_web_traffic_weekly: 0.5214463673288238
+      m1_monthly: 0.33280403653964513
+      m1_quarterly: 0.22764187948158027
+      m1_yearly: 0.1353240489856994
+      m4_monthly: 0.989376918871495
+      m4_quarterly: 0.42200935083170876
+      m4_yearly: 0.16910075664762209
+      monash_m3_monthly: 0.45439173163627383
+      monash_m3_other: 0.31369325979707874
+      monash_m3_quarterly: 0.22388844073883546
+      monash_m3_yearly: 0.12991127435192062
+      nn5_weekly: 0.4802795488554957
+      rideshare_with_missing: 1.7061359211723797
+      tourism_monthly: 1.2559503914072827
+      tourism_quarterly: 0.41914527015987135
+      tourism_yearly: 0.12224503666516284
+      traffic_weekly: 0.43911273038216747
+      uber_tlc_daily: 0.8220619090134031
+      vehicle_trips_with_missing: 0.4520147254997792
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]
+  
+  - _target_: uni2ts.data.builder.lotsa_v1.OthersLOTSADatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      cdc_fluview_who_nrevss: 2.5812707799492274
+      godaddy: 0.18753772860071735
+      restaurant: 1.6362806757063764
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]

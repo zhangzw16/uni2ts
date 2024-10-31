@@ -16,6 +16,7 @@
 from functools import partial
 from typing import Callable, Optional
 import itertools
+import h5py
 import types
 import json
 from collections import defaultdict
@@ -41,9 +42,10 @@ import torch.nn.functional as F
 from probts.data.lotsa_datasets import LotsaUniTSDatasetLoader
 from probts.model.forecaster.prob_forecaster.moirai import Moirai
 
+
 BATCH_SIZE = 10
-TARGET_DATASET = "ETTh1"
-SAVE_PATH = "/data/Blob_EastUS/v-zhenwzhang/tsfm_datasets/lotsa_weights"
+TARGET_DATASET = "Electricity"
+SAVE_PATH = "/data/Blob_EastUS/v-zhenwzhang/tsfm_datasets/lotsa_embeddings/moirai_small"
 EMBED_DIM = 0
 
 moirai = Moirai(
@@ -108,16 +110,21 @@ def get_dataset_embeddings(dataset: Dataset) -> np.ndarray:
 
 
 def get_dataset_level_weights(dataset: Dataset, target_embeddings: np.ndarray) -> np.ndarray:
+    global SAVE_PATH, TARGET_DATASET
+
     dataset_embeddings = get_dataset_embeddings(dataset)
+
+    if not os.path.exists(SAVE_PATH):
+        os.makedirs(SAVE_PATH)
+        
+    with h5py.File(os.path.join(SAVE_PATH, f"{dataset.indexer.dataset_name}.h5"), 'w') as f:
+        f.create_dataset('embeddings', data=dataset_embeddings.cpu().numpy(), dtype='float16')
 
     dataset_embeddings_norm = F.normalize(dataset_embeddings, p=2, dim=1)
     target_embeddings_norm = F.normalize(target_embeddings, p=2, dim=1)
     distances = 1 - torch.matmul(dataset_embeddings_norm, target_embeddings_norm.T)
     distances = distances.cpu().numpy()
 
-    global SAVE_PATH, TARGET_DATASET
-    if not os.path.exists(SAVE_PATH):
-        os.makedirs(SAVE_PATH)
     np.save(os.path.join(SAVE_PATH, f"{dataset.indexer.dataset_name}_to_{TARGET_DATASET}_distances.npy"), distances)
     return distances
 
@@ -129,11 +136,21 @@ def get_all_weights(train_dataset: Dataset, target_dataset: Dataset) -> dict:
     global EMBED_DIM
     EMBED_DIM = target_embeddings.shape[1]
 
-    if isinstance(train_dataset, ConcatDataset):
-        for dataset in train_dataset.datasets:
-            dataset_name = dataset.indexer.dataset_name
-            weight = get_dataset_level_weights(dataset, target_embeddings)
-            weights[dataset_name] = float(np.mean(weight))
+    def flatten_concat_dataset(dataset):
+        if isinstance(dataset, ConcatDataset):
+            datasets = []
+            for sub_dataset in dataset.datasets:
+                datasets.extend(flatten_concat_dataset(sub_dataset))
+            return datasets
+        else:
+            return [dataset]
+
+    all_datasets = flatten_concat_dataset(train_dataset)
+
+    for dataset in all_datasets:
+        dataset_name = dataset.indexer.dataset_name
+        weight = get_dataset_level_weights(dataset, target_embeddings)
+        weights[dataset_name] = float(np.mean(weight))
     
     return weights
 

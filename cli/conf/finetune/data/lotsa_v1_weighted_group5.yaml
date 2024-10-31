@@ -1,0 +1,94 @@
+_target_: uni2ts.data.builder.ConcatDatasetBuilder
+_args_:
+  - _target_: uni2ts.data.builder.lotsa_v1.BuildingsBenchDatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      borealis: 25.39199857374493
+      ideal: 26.45917685053796
+      lcl: 61.224515184913
+      sceaux: 156.53911429030117
+      smart: 87.55633398363929
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]
+  
+  - _target_: uni2ts.data.builder.lotsa_v1.CloudOpsTSFDatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      azure_vm_traces_2017: 0.793621442692541
+      borg_cluster_data_2011: 0.8826552014078424
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]
+    
+  - _target_: uni2ts.data.builder.lotsa_v1.GluonTSDatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      australian_electricity_demand: 1055.3196249274629
+      elecdemand: 80.13807329474555
+      extended_web_traffic_with_missing: 0.8724512708896471
+      kdd_cup_2018_with_missing: 49.07836945864431
+      london_smart_meters_with_missing: 22.927608461787116
+      m5: 4.15088221413791
+      nn5_daily_with_missing: 3.361956841988469
+      saugeenday: 108.45627031345387
+      solar_power: 33835.5661423233
+      sunspot_with_missing: 337.9978760297904
+      taxi_30min: 1.8616203622773724
+      temperature_rain_with_missing: 3.178993204329233
+      uber_tlc_hourly: 19.718242630954066
+      us_births: 33.276511599273626
+      weather: 42.04664408939033
+      wiki-rolling_nips: 2.6546491601272133
+      wind_farms_with_missing: 375.55014453728455
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]
+
+  - _target_: uni2ts.data.builder.lotsa_v1.LibCityDatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      BEIJING_SUBWAY_30MIN: 7.190470960007991
+      HZMETRO: 10.872614167900124
+      LOOP_SEATTLE: 391.82785978038663
+      LOS_LOOP: 156.76324474643377
+      PEMS_BAY: 238.43821259751687
+      Q-TRAFFIC: 2.8032337802131853
+      SHMETRO: 40.29316710350534
+      SZ_TAXI: 13.612494641847192
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]
+
+  - _target_: uni2ts.data.builder.lotsa_v1.OthersLOTSADatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      beijing_air_quality: 160.38592477208667
+      cdc_fluview_ilinet: 3.897308445779395
+      china_air_quality: 60.07271910855663
+      favorita_sales: 1.1316201601311238
+      favorita_transactions: 7.1498123738614945
+      hierarchical_sales: 8.224215512782676
+      kdd2022: 161.37389428043952
+      residential_load_power: 467.01254136186304
+      residential_pv_power: 543.1776768629394
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]
+
+  - _target_: uni2ts.data.builder.lotsa_v1.ProEnFoDatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      bull: 80.2478514773411
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]
+
+  - _target_: uni2ts.data.builder.lotsa_v1.SubseasonalDatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      subseasonal: 75.3352778061906
+      subseasonal_precip: 51.79243173038835
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]

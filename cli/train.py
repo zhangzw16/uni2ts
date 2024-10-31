@@ -50,6 +50,7 @@ class DataModule(L.LightningDataModule):
         shuffle: bool,
         world_size: int,
         batch_size: int,
+        seed: int,
         num_batches_per_epoch: Optional[int] = None,
     ) -> DataLoader:
         sampler = (
@@ -58,7 +59,7 @@ class DataModule(L.LightningDataModule):
                 num_replicas=None,
                 rank=None,
                 shuffle=shuffle,
-                seed=0,
+                seed=seed,
                 drop_last=False,
             )
             if world_size > 1
@@ -79,6 +80,7 @@ class DataModule(L.LightningDataModule):
             self.cfg.train_dataloader.shuffle,
             self.trainer.world_size,
             self.train_batch_size,
+            seed=self.cfg.seed,
             num_batches_per_epoch=self.train_num_batches_per_epoch,
         )
 
@@ -90,6 +92,7 @@ class DataModule(L.LightningDataModule):
                 shuffle=self.cfg.val_dataloader.shuffle,
                 world_size=self.trainer.world_size,
                 batch_size=self.val_batch_size,
+                seed=self.cfg.seed,
                 num_batches_per_epoch=None,
             ),
             self.val_dataset,
@@ -138,7 +141,8 @@ def main(cfg: DictConfig):
         if "val_data" in cfg
         else None
     )
-    L.seed_everything(cfg.seed + trainer.logger.version, workers=True)
+    L.seed_everything(cfg.seed, workers=True)
+    print("Set global seed: ", cfg.seed)
     trainer.fit(
         model,
         datamodule=DataModule(cfg, train_dataset, val_dataset),

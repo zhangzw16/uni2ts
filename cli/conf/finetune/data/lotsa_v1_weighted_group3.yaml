@@ -1,0 +1,50 @@
+_target_: uni2ts.data.builder.ConcatDatasetBuilder
+_args_:
+  - _target_: uni2ts.data.builder.lotsa_v1.CMIP6DatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      cmip6_1850: 0.014186655115280208
+      cmip6_1855: 0.014186655115280208
+      cmip6_1860: 0.014186655115280208
+      cmip6_1865: 0.014186655115280208
+      cmip6_1870: 0.014186655115280208
+      cmip6_1875: 0.014186655115280208
+      cmip6_1880: 0.014186655115280208
+      cmip6_1885: 0.014186655115280208
+      cmip6_1890: 0.014186655115280208
+      cmip6_1895: 0.014186655115280208
+      cmip6_1900: 0.014186655115280208
+      cmip6_1905: 0.014186655115280208
+      cmip6_1910: 0.014186655115280208
+      cmip6_1915: 0.014186655115280208
+      cmip6_1920: 0.014186655115280208
+      cmip6_1925: 0.014186655115280208
+      cmip6_1930: 0.014186655115280208
+      cmip6_1935: 0.014186655115280208
+      cmip6_1940: 0.014186655115280208
+      cmip6_1945: 0.014186655115280208
+      cmip6_1950: 0.014186655115280208
+      cmip6_1955: 0.014186655115280208
+      cmip6_1960: 0.014186655115280208
+      cmip6_1965: 0.014186655115280208
+      cmip6_1970: 0.014186655115280208
+      cmip6_1975: 0.014186655115280208
+      cmip6_1980: 0.014186655115280208
+      cmip6_1985: 0.014186655115280208
+      cmip6_1990: 0.014186655115280208
+      cmip6_1995: 0.014186655115280208
+      cmip6_2000: 0.014186655115280208
+      cmip6_2005: 0.014186655115280208
+      cmip6_2010: 0.014186655115280208
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]
+  - _target_: uni2ts.data.builder.lotsa_v1.GluonTSDatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      fred_md: 3.275049114100332
+      m4_daily: 10.78288428974575
+      wind_power: 33835.223085502694
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]

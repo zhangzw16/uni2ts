@@ -40,6 +40,7 @@ from uni2ts.module.position import (
 from uni2ts.module.ts_embed import MultiInSizeLinear, MultiOutSizeLinear
 from uni2ts.optim import SchedulerType, get_scheduler
 from uni2ts.transform import (
+    SampleDimension,
     AddObservedMask,
     AddTimeIndex,
     AddVariateIndex,
@@ -332,7 +333,12 @@ class MoiraiFinetune(L.LightningModule):
     ) -> dict[str | type, Callable[..., Transformation]]:
         def default_train_transform():
             return (
-                GetPatchSize(
+                SampleDimension(
+                    max_dim=self.hparams.max_dim,
+                    fields=("target",),
+                    optional_fields=("past_feat_dynamic_real",),
+                )
+                + GetPatchSize(
                     min_time_patches=self.hparams.min_patches,
                     target_field="target",
                     patch_sizes=self.module.patch_sizes,

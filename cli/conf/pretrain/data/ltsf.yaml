@@ -3,25 +3,25 @@ _convert_: all
 _args_:
   - _target_: uni2ts.data.builder.simple.SimpleDatasetBuilder
     dataset: ETTh1
-    weight: 1000
+    weight: 1
   - _target_: uni2ts.data.builder.simple.SimpleDatasetBuilder
     dataset: ETTh2
-    weight: 1000
+    weight: 1
   - _target_: uni2ts.data.builder.simple.SimpleDatasetBuilder
     dataset: ETTm1
-    weight: 1000
+    weight: 1
   - _target_: uni2ts.data.builder.simple.SimpleDatasetBuilder
     dataset: ETTm2
-    weight: 1000
+    weight: 1
   - _target_: uni2ts.data.builder.simple.SimpleDatasetBuilder
     dataset: Traffic
-    weight: 1000
+    weight: 1
   - _target_: uni2ts.data.builder.simple.SimpleDatasetBuilder
     dataset: Electricity
-    weight: 1000
+    weight: 1
   - _target_: uni2ts.data.builder.simple.SimpleDatasetBuilder
     dataset: Weather
-    weight: 1000
+    weight: 1
   - _target_: uni2ts.data.builder.simple.SimpleDatasetBuilder
     dataset: Exchange
-    weight: 1000
+    weight: 1

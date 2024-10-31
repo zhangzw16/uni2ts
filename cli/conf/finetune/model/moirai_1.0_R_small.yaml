@@ -29,7 +29,7 @@ val_metric:
   - _target_: uni2ts.loss.packed.PackedMSELoss
   - _target_: uni2ts.loss.packed.PackedNRMSELoss
     normalize: absolute_target_squared
-lr: 1e-5
+lr: 1e-4
 weight_decay: 1e-1
 beta1: 0.9
 beta2: 0.98

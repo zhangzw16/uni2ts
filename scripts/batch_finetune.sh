@@ -1,12 +1,12 @@
 
 MODEL=moirai_1.0_R_small
 
-for dataset in etth1 etth2 ettm1 ettm2 traffic electricity exchange weather
+for dataset in lotsa_v1_weighted_group1 lotsa_v1_weighted_group2 lotsa_v1_weighted_group3 lotsa_v1_weighted_group4 lotsa_v1_weighted_group5
 do 
     python -m cli.train \
     -cp conf/finetune \
-    run_name=${MODEL}_ft_${DATA}_val_${VAL_DATA} \
+    --config-name group.yaml \
+    run_name=${MODEL}_ft_${dataset} \
     model=${MODEL} \
-    data=${dataset} \
-    val_data=${dataset}
+    data=${dataset}
 done
