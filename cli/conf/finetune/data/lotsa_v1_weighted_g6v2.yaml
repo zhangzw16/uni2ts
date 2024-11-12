@@ -1,0 +1,23 @@
+_target_: uni2ts.data.builder.ConcatDatasetBuilder
+_args_:
+  - _target_: uni2ts.data.builder.lotsa_v1.LargeSTDatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      largest_2017: 0.5979278516007128
+      largest_2018: 0.5979278516007128
+      largest_2019: 0.5979278516007128
+      largest_2020: 0.5979278516007128
+      largest_2021: 0.5979278516007128
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]
+  - _target_: uni2ts.data.builder.lotsa_v1.LibCityDatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      PEMS03: 119.8777753943317
+      PEMS04: 77.72295327764364
+      PEMS07: 129.0991427323572
+      PEMS08: 81.67496785108314
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]

@@ -1,0 +1,40 @@
+_target_: uni2ts.data.builder.ConcatDatasetBuilder
+_args_:
+  - _target_: uni2ts.data.builder.lotsa_v1.BuildingsBenchDatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      bdg-2_bear: 74.50802078734561
+      bdg-2_fox: 78.76137356782516
+      bdg-2_panther: 40.069036647372776
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]
+  - _target_: uni2ts.data.builder.lotsa_v1.GluonTSDatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      m4_hourly: 3.905654946409425
+      pedestrian_counts: 216.97560763837362
+      traffic_hourly: 79.4794041991723
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]
+  - _target_: uni2ts.data.builder.lotsa_v1.LibCityDatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      M_DENSE: 80.13807329474554
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]
+  - _target_: uni2ts.data.builder.lotsa_v1.ProEnFoDatasetBuilder
+    datasets: ${cls_getattr:${._target_},dataset_list}
+    weight_map:
+      covid19_energy: 145.96839012453881
+      elf: 99.67858979675201
+      gfc12_load: 180.2832203675286
+      gfc14_load: 80.13807329474555
+      gfc17_load: 80.24785147734109
+      pdb: 80.13807329474555
+      spain: 160.38592477208664
+    sample_time_series:
+      _target_: uni2ts.data.dataset.SampleTimeSeriesType
+      _args_: ["proportional"]

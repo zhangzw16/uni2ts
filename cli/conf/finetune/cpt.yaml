@@ -7,7 +7,7 @@ defaults:
   - val_data: null
   - _self_
 run_name: ???
-seed: 321
+seed: 2
 tf32: true
 compile: false  # set to mode: default, reduce-overhead, max-autotune
 ckpt_path: null
@@ -31,7 +31,7 @@ trainer:
       save_weights_only: true
       mode: max
       save_top_k: -1
-      every_n_epochs: 1
+      every_n_epochs: 10
   max_epochs: 100
   enable_progress_bar: true
   accumulate_grad_batches: 1
