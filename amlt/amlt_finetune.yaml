@@ -1,4 +1,4 @@
-description: moirai small finetune lotsa_v1_weighted group_v2 rerun
+description: moirai small finetune lotsa_v1_weighted group_v1 fix_weights_bug 1 rerun4
 
 target:
   service: sing
@@ -34,7 +34,7 @@ storage:
 
 search:
   job_template:
-    name: "{experiment_name:s}_{dataset:s}_rerun2"
+    name: "{experiment_name:s}_{dataset:s}_fix_weights"
     sku: 40G1-A100
     identity: managed
     command:
@@ -42,10 +42,13 @@ search:
     submit_args:
       env:
         _AZUREML_SINGULARITY_JOB_UAI: "/subscriptions/e033d461-1923-44a7-872b-78f1d35a86dd/resourcegroups/Shun/providers/Microsoft.ManagedIdentity/userAssignedIdentities/epeastus_mi" 
+        SHARED_MEMORY_PERCENT: 1.0
+        DATASET_MOUNT_CACHE_SIZE: 40G
   type: grid
   max_trials: 8
   params:
     - name: dataset
-      values: ["g3v2", "g5v2"]
+      values: ["group1"]
+      # values: ["group1", "group2", "group3", "group4", "group5"]
       # values: ["g1v2", "g2v2", "g3v2", "g4v2", "g5v2", "g6v2", "g7v2", "g8v2"]
-
+      # values: ["g3v2", "g5v2"]

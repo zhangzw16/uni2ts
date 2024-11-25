@@ -16,11 +16,13 @@
 from functools import partial
 from typing import Callable, Optional
 
+import os
 import hydra
 import lightning as L
 import torch
 from hydra.utils import instantiate
 from omegaconf import DictConfig
+from dotenv import load_dotenv
 from torch.utils._pytree import tree_map
 from torch.utils.data import Dataset, DistributedSampler
 
@@ -133,6 +135,7 @@ def main(cfg: DictConfig):
     train_dataset: Dataset = instantiate(cfg.data).load_dataset(
         model.train_transform_map
     )
+    print("Length of training dataset: ", len(train_dataset))
     val_dataset: Optional[Dataset | list[Dataset]] = (
         tree_map(
             lambda ds: ds.load_dataset(model.val_transform_map),
@@ -151,4 +154,6 @@ def main(cfg: DictConfig):
 
 
 if __name__ == "__main__":
+    load_dotenv()
+    print("HF_DATASETS_IN_MEMORY_MAX_SIZE: ", os.getenv("HF_DATASETS_IN_MEMORY_MAX_SIZE"))
     main()

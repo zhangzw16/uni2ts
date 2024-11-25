@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Run CLI Train",
+            "name": "Python: Run CLI Pre-train",
             "type": "debugpy",
             "request": "launch",
-            "module": "cli.train_weights",
+            "module": "cli.train",
             "console": "integratedTerminal",
             "justMyCode": false,
             "args": [
@@ -16,6 +16,21 @@
                 "run_name=debug",
                 "model=moirai_small",
                 "data=lotsa_v1_weighted_debug",
+            ],
+        },
+        {
+            "name": "Python: Run CLI finetune",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "cli.train",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "-cp", "conf/finetune",
+                "--config-name", "cpt.yaml",
+                "run_name=debug",
+                "model=moirai_1.0_R_small",
+                "data=lotsa_v1_weighted_g1v2",
             ],
         },
         {

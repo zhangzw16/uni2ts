@@ -118,12 +118,13 @@ class TimeSeriesDataset(Dataset):
             raise IndexError(
                 f"Index {idx} out of range for dataset of length {len(self)}"
             )
-
+        idx_ori = idx
         if self.sample_time_series != SampleTimeSeriesType.NONE:
             idx = np.random.choice(len(self.probabilities), p=self.probabilities)
 
+        # print(f"Sample from {self.indexer.dataset_name} at index {idx}, original index {idx_ori}")
         return self.transform(self._flatten_data(self._get_data(idx)))
-
+ 
     @property
     def num_ts(self) -> int:
         """
