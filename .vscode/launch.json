@@ -15,7 +15,21 @@
                 "-cp", "conf/pretrain",
                 "run_name=debug",
                 "model=moirai_small",
-                "data=lotsa_v1_weighted_debug",
+                "data=buildings_bench",
+            ],
+        },
+        {
+            "name": "Python: Run CLI Sample only",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "cli.sample",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "-cp", "conf/pretrain",
+                "run_name=debug",
+                "model=moirai_small",
+                "data=buildings_bench",
             ],
         },
         {
