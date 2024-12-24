@@ -19,7 +19,7 @@ import torch
 import itertools
 
 from enum import Enum
-from typing import Any, Sequence, Iterator
+from typing import Any, Union, List
 
 import numpy as np
 from torch.utils.data import Dataset
@@ -56,7 +56,9 @@ class SampleTimeSeriesType(Enum):
 class TimeSeriesDataset(Dataset):
     # Class variable to cache the YAML data
     _yaml_data_cache = None
-    
+    # for counting how many times a time series is sampled
+    ts_sample_counts = {}
+
     def __init__(
         self,
         indexer: Indexer[dict[str, Any]],
@@ -74,6 +76,7 @@ class TimeSeriesDataset(Dataset):
         self.transform = transform
         self.sample_time_series = sample_time_series
         self.dataset_weight = dataset_weight
+        
         
         # Load the YAML file only once
         # if TimeSeriesDataset._yaml_data_cache is None:
@@ -132,6 +135,17 @@ class TimeSeriesDataset(Dataset):
         """
         return len(self.indexer)
 
+    def _sample_ts(self, series_names: Union[List[str], str]) -> None:
+        ts_sample_counts = TimeSeriesDataset.ts_sample_counts
+        dataset_name = self.indexer.dataset_name
+        # init as {} if not exists
+        if dataset_name not in ts_sample_counts:
+            ts_sample_counts[dataset_name] = {}
+        if isinstance(series_names, str):
+            series_names = [series_names]
+        for series_name in series_names:
+            ts_sample_counts[dataset_name][series_name] = ts_sample_counts[dataset_name].get(series_name, 0) + 1
+
     def __len__(self) -> int:
         """
         Length is the number of time series multiplied by dataset_weight
@@ -142,6 +156,8 @@ class TimeSeriesDataset(Dataset):
         """
         Obtains time series from Indexer object
         """
+        samples = self.indexer[idx % self.num_ts]
+        self._sample_ts(samples['item_id'])
         return self.indexer[idx % self.num_ts]
     
     def _convert_to_cycle(self, series_prob: dict[str, float]) -> list[float]:
@@ -206,6 +222,7 @@ class MultiSampleTimeSeriesDataset(TimeSeriesDataset):
         # others = np.random.choice(choices, n_series - 1, replace=False, p=probabilities)
         others = np.random.choice(choices, n_series - 1, replace=False)
         samples = self.indexer[np.concatenate([[idx], others])]
+        self._sample_ts(samples['item_id'])
         return samples
 
     def _flatten_data(
