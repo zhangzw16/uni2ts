@@ -17,7 +17,6 @@ from functools import partial
 from typing import Callable, Optional
 
 import os
-import json
 import hydra
 import lightning as L
 import torch
@@ -30,6 +29,9 @@ from torch.utils.data import Dataset, DistributedSampler
 from uni2ts.common import hydra_util  # noqa: hydra resolvers
 from uni2ts.data.loader import DataLoader
 from uni2ts.model.moirai.void import MoiraiVoid
+
+import uni2ts.common.sample_counter as sc
+sc.initialize_counter_global()
 
 
 class DataModule(L.LightningDataModule):
@@ -161,13 +163,7 @@ def main(cfg: DictConfig):
         ckpt_path=cfg.ckpt_path,
     )
 
-    # save train_dataset.datasets[0].ts_sample_counts to json file
-    ts_sample_counts = train_dataset.datasets[0].ts_sample_counts
-    print(f"Saving ts_sample_counts to json file consists of {len(ts_sample_counts)} datasets...")
-    # save dict to json file
-    with open("ts_sample_counts.json", "w") as f:
-        json.dump(ts_sample_counts, f)
-
+    sc.sample_counter.save_to_files()    
 
 
 if __name__ == "__main__":

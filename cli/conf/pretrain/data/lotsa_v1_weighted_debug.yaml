@@ -27,7 +27,7 @@ _args_:
     weight_map:
       azure_vm_traces_2017: 0.793621442692541
       borg_cluster_data_2011: 0.8826552014078424
-      alibaba_cluster_trace_2018: 2.1667961908107465
+      # alibaba_cluster_trace_2018: 2.1667961908107465
     sample_time_series:
       _target_: uni2ts.data.dataset.SampleTimeSeriesType
       _args_: ["proportional"]

@@ -64,7 +64,7 @@ class LOTSADatasetBuilder(DatasetBuilder, abc.ABC):
         ), f"Invalid datasets {set(datasets).difference(self.dataset_list)}, must be one of {self.dataset_list}"
         weight_map = weight_map or dict()
         self.datasets = datasets
-        self.weights = [weight_map.get(dataset, 0.0) for dataset in datasets]
+        self.weights = [weight_map.get(dataset, 1.0) for dataset in datasets]
         self.sample_time_series = sample_time_series
         self.storage_path = storage_path
 

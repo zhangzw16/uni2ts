@@ -118,6 +118,12 @@ class MoiraiVoid(L.LightningModule):
                     fields=("target",),
                     feat=False,
                 )
+                + PackFields(
+                    output_field="past_feat_dynamic_real",
+                    fields=tuple(),
+                    optional_fields=("past_feat_dynamic_real",),
+                    feat=False,
+                )
                 + AddObservedMask(
                     fields=("target",),
                     optional_fields=("past_feat_dynamic_real",),

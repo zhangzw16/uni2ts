@@ -38,7 +38,7 @@ from uni2ts.common.typing import (
 )
 from uni2ts.data.indexer import Indexer
 from uni2ts.transform import Transformation
-
+import uni2ts.common.sample_counter as sc
 
 class SampleTimeSeriesType(Enum):
     """
@@ -57,7 +57,7 @@ class TimeSeriesDataset(Dataset):
     # Class variable to cache the YAML data
     _yaml_data_cache = None
     # for counting how many times a time series is sampled
-    ts_sample_counts = {}
+    # ts_sample_counts = {} # needs num_workers=0
 
     def __init__(
         self,
@@ -126,7 +126,8 @@ class TimeSeriesDataset(Dataset):
             idx = np.random.choice(len(self.probabilities), p=self.probabilities)
 
         # print(f"Sample from {self.indexer.dataset_name} at index {idx}, original index {idx_ori}")
-        return self.transform(self._flatten_data(self._get_data(idx)))
+        samples = self._get_data(idx)
+        return self.transform(self._flatten_data(samples))
  
     @property
     def num_ts(self) -> int:
@@ -135,16 +136,13 @@ class TimeSeriesDataset(Dataset):
         """
         return len(self.indexer)
 
-    def _sample_ts(self, series_names: Union[List[str], str]) -> None:
-        ts_sample_counts = TimeSeriesDataset.ts_sample_counts
+    def _sample_ts(self, samples) -> None:
         dataset_name = self.indexer.dataset_name
-        # init as {} if not exists
-        if dataset_name not in ts_sample_counts:
-            ts_sample_counts[dataset_name] = {}
-        if isinstance(series_names, str):
-            series_names = [series_names]
-        for series_name in series_names:
-            ts_sample_counts[dataset_name][series_name] = ts_sample_counts[dataset_name].get(series_name, 0) + 1
+        if isinstance(samples['target'], np.ndarray):
+            shape = samples['target'].shape
+        else:
+            shape = (samples['target'][0].shape[0],)
+        sc.sample_counter.record_candidate_variables(dataset_name, samples['item_id'], shape)
 
     def __len__(self) -> int:
         """
@@ -157,7 +155,7 @@ class TimeSeriesDataset(Dataset):
         Obtains time series from Indexer object
         """
         samples = self.indexer[idx % self.num_ts]
-        self._sample_ts(samples['item_id'])
+        self._sample_ts(samples)
         return self.indexer[idx % self.num_ts]
     
     def _convert_to_cycle(self, series_prob: dict[str, float]) -> list[float]:
@@ -222,7 +220,7 @@ class MultiSampleTimeSeriesDataset(TimeSeriesDataset):
         # others = np.random.choice(choices, n_series - 1, replace=False, p=probabilities)
         others = np.random.choice(choices, n_series - 1, replace=False)
         samples = self.indexer[np.concatenate([[idx], others])]
-        self._sample_ts(samples['item_id'])
+        self._sample_ts(samples)
         return samples
 
     def _flatten_data(

@@ -60,7 +60,7 @@ train_dataloader:
   cycle: true
   num_batches_per_epoch: 100
   shuffle: true
-  num_workers: 11
+  num_workers: 4
   collate_fn:
     _target_: uni2ts.data.loader.PackCollate
     max_length: ${model.module_kwargs.max_seq_len}
@@ -70,5 +70,5 @@ train_dataloader:
   drop_last: true
   fill_last: false
   worker_init_fn: null
-  prefetch_factor: 4
+  prefetch_factor: 2
   persistent_workers: true

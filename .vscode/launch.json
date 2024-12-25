@@ -29,7 +29,7 @@
                 "-cp", "conf/pretrain",
                 "run_name=debug",
                 "model=moirai_small",
-                "data=buildings_bench",
+                "data=lotsa_v1_weighted_debug",
             ],
         },
         {

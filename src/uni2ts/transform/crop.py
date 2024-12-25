@@ -24,7 +24,7 @@ from uni2ts.common.typing import UnivarTimeSeries
 
 from ._base import Transformation
 from ._mixin import MapFuncMixin
-
+import uni2ts.common.sample_counter as sc
 
 @dataclass
 class PatchCrop(MapFuncMixin, Transformation):
@@ -53,6 +53,7 @@ class PatchCrop(MapFuncMixin, Transformation):
 
     def __call__(self, data_entry: dict[str, Any]) -> dict[str, Any]:
         a, b = self._get_boundaries(data_entry)
+        sc.sample_counter.update_crop(a, b)
         self.map_func(
             partial(self._crop, a=a, b=b),  # noqa
             data_entry,
