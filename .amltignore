@@ -4,3 +4,4 @@ weights/
 ckpts/
 tsfm_datasets/
 example/
+debug/

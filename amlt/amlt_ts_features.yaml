@@ -1,0 +1,99 @@
+description: compute features for lotsa dataset
+
+target:
+  service: sing
+  name: msrresrchvc
+
+# name: msrresrchvc, msroctovc
+# amlt-sing/acpt-2.0.1-py3.10-cuda11.8
+# amlt-sing/acpt-2.2.1-py3.10-cuda12.1
+environment:
+  image: amlt-sing/acpt-2.3.1-py3.10-cuda12.1
+  setup:
+    - pip install -e .
+
+code:
+  # local directory of the code. this will be uploaded to the server.
+  local_dir: $CONFIG_DIR/..
+
+storage:
+  shared_data:
+    storage_account_name: epeastus
+    container_name: cov19
+    mount_dir: /data/Blob_EastUS
+
+# jobs:
+# - name: moirai_pretrain base_1.1 finetune lotsa_v1_weighted all seed g5v2 rerun
+#   sku: 40G1-A100
+#   identity: managed
+#   submit_args:
+#     env:
+#       _AZUREML_SINGULARITY_JOB_UAI: "/subscriptions/e033d461-1923-44a7-872b-78f1d35a86dd/resourcegroups/Shun/providers/Microsoft.ManagedIdentity/userAssignedIdentities/epeastus_mi" 
+#   command:
+#   - sh scripts/finetune.sh lotsa_v1_weighted_g5v2
+
+search:
+  job_template:
+    name: "{experiment_name:s}_{dataset:s}"
+    sku: 8C7
+    identity: managed
+    command:
+      - python cli/ts_feature.py {dataset}
+    submit_args:
+      env:
+        _AZUREML_SINGULARITY_JOB_UAI: "/subscriptions/e033d461-1923-44a7-872b-78f1d35a86dd/resourcegroups/Shun/providers/Microsoft.ManagedIdentity/userAssignedIdentities/epeastus_mi" 
+        # SHARED_MEMORY_PERCENT: 1.0
+        # DATASET_MOUNT_CACHE_SIZE: 40G
+  type: grid
+  max_trials: 128
+  params:
+    - name: dataset
+      values: [
+        "buildings_900k",
+        "azure_vm_traces_2017",
+        "borg_cluster_data_2011",
+        "alibaba_cluster_trace_2018",
+        "cmip6_1850 cmip6_1855 cmip6_1860 cmip6_1865 cmip6_1870 cmip6_1875",
+        "cmip6_1880 cmip6_1885 cmip6_1890 cmip6_1895 cmip6_1900 cmip6_1905",
+        "cmip6_1910 cmip6_1915 cmip6_1920 cmip6_1925 cmip6_1930 cmip6_1935",
+        "cmip6_1940 cmip6_1945 cmip6_1950 cmip6_1955 cmip6_1960 cmip6_1965",
+        "cmip6_1970 cmip6_1975 cmip6_1980 cmip6_1985 cmip6_1990 cmip6_1995",
+        "cmip6_2000 cmip6_2005 cmip6_2010",
+        "era5_1989 era5_1990 era5_1991 era5_1992 era5_1993",
+        "era5_1994 era5_1995 era5_1996 era5_1997 era5_1998",
+        "era5_1999 era5_2000 era5_2001 era5_2002 era5_2003",
+        "era5_2004 era5_2005 era5_2006 era5_2007 era5_2008",
+        "era5_2009 era5_2010 era5_2011 era5_2012 era5_2013",
+        "era5_2014 era5_2015 era5_2016 era5_2017 era5_2018",
+        "taxi_30min",
+        "uber_tlc_daily uber_tlc_hourly wiki-rolling_nips london_smart_meters_with_missing",
+        "wind_farms_with_missing wind_power solar_power oikolab_weather elecdemand",
+        "covid_mobility kaggle_web_traffic_weekly m4_yearly",
+        "m5",
+        "extended_web_traffic_with_missing",
+        "m1_yearly m1_quarterly monash_m3_yearly monash_m3_quarterly tourism_yearly",
+        "m4_hourly m4_daily m4_weekly m4_monthly m4_quarterly",
+        "m1_monthly monash_m3_monthly monash_m3_other nn5_daily_with_missing nn5_weekly",
+        "tourism_monthly tourism_quarterly cif_2016_6 cif_2016_12 traffic_hourly",
+        "traffic_weekly australian_electricity_demand rideshare_with_missing saugeenday sunspot_with_missing",
+        "temperature_rain_with_missing vehicle_trips_with_missing weather car_parts_with_missing fred_md",
+        "pedestrian_counts hospital covid_deaths kdd_cup_2018_with_missing bitcoin_with_missing",
+        "us_births",
+        "largest_2017",
+        "largest_2018",
+        "largest_2019",
+        "largest_2020",
+        "largest_2021",
+        "BEIJING_SUBWAY_30MIN HZMETRO LOOP_SEATTLE LOS_LOOP",
+        "M_DENSE PEMS03 PEMS04 PEMS07 PEMS08",
+        "PEMS_BAY SHMETRO SZ_TAXI kdd2022",
+        "Q-TRAFFIC",
+        "godaddy favorita_sales restaurant hierarchical_sales",
+        "favorita_transactions",
+        "china_air_quality beijing_air_quality cdc_fluview_ilinet",
+        "residential_load_power",
+        "residential_pv_power",
+        "cdc_fluview_who_nrevss project_tycho gfc12_load gfc14_load gfc17_load",
+        "spain pdb elf bull cockatoo",
+        "hog covid19_energy subseasonal subseasonal_precip"
+      ]

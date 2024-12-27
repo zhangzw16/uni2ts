@@ -1,9 +1,13 @@
-import pandas as pd
+import argparse
+from collections import defaultdict
+from pathlib import Path
 
 import datasets
-
+import pandas as pd
+from tsfeatures import entropy, hurst, lumpiness, stability, stl_features, tsfeatures
 
 from uni2ts.common.env import env
+from tqdm import tqdm
 from uni2ts.data.builder.lotsa_v1 import (
 	Buildings900KDatasetBuilder,
 	BuildingsBenchDatasetBuilder,
@@ -18,13 +22,8 @@ from uni2ts.data.builder.lotsa_v1 import (
 	SubseasonalDatasetBuilder,
 )
 
-from tsfeatures import tsfeatures
-from tsfeatures import entropy, stability, lumpiness, hurst, stl_features
-from collections import defaultdict
-
-
 class TSFeature:
-	def __init__(self, features=None, threads=64):
+	def __init__(self, features=None, threads=8):
 		if features is None:
 			self.features = [entropy, stability, lumpiness, hurst, stl_features]
 		else:
@@ -50,15 +49,12 @@ class TSFeature:
 
 
 	@staticmethod
-	def hf_dataset_to_panel(dataset):
-		# Convert HuggingFace dataset to pandas DataFrame
-		# data format of hf:
-		# {'item_id': 'Fox_assembly_Cathy', 'start': array('2016-01-01T00:00:00', dtype='datetime64[s]'), 'freq': 'H', 'target': array([43.29, 43.26, 43.13, ...,  2.3 ,  0.75,  3.76], dtype=float32)}
-		# data format of panel:
-		# unique_id, ds, y
-
+	def hf_dataset_to_panel(dataset, start_idx, end_idx):
+		# Convert a slice of HuggingFace dataset to pandas DataFrame
 		panel_data = []
-		for data in dataset:
+
+		for i in range(start_idx, end_idx):
+			data = dataset[i]
 			item_id = data['item_id']
 			start_time = data['start']
 			target = data['target']
@@ -89,19 +85,45 @@ class TSFeature:
 		panel = pd.concat(panel_data, ignore_index=True)
 		return panel, freq
 
-	def calculate_features(self, dataset, is_save=False, dataset_name=None):
-		# Convert HuggingFace dataset to pandas DataFrame
-		panel, freq_str = self.hf_dataset_to_panel(dataset)
-		freq = self.freq_dict[freq_str]
+	def calculate_features(self, dataset, is_save=False, dataset_name=None, K=64):
+		tsf_path = env.LOTSA_V1_PATH.parent / "lotsa_features"
+		# if csv file exist, return it
+		if is_save and (tsf_path / f"{dataset_name}_tsf.csv").exists():
+			print(f"Loading features from {tsf_path / f'{dataset_name}_tsf.csv'}")
+			return pd.read_csv(tsf_path / f"{dataset_name}_tsf.csv")
 		
-		# Calculate features
-		result = tsfeatures(panel, freq=freq, threads=self.threads, features=self.features)
+		total_length = len(dataset)
+		row_length = dataset[0]['target'].size
+		print(f"Total number of rows: {total_length}, each row len: {row_length}")
+		all_results = []
+
+		with tqdm(total=total_length, desc="Calculating features") as pbar:
+			for start_idx in range(0, total_length, K):
+				end_idx = min(start_idx + K, total_length)
+
+				# Convert a slice of HuggingFace dataset to pandas DataFrame
+				panel, freq_str = self.hf_dataset_to_panel(dataset, start_idx, end_idx)
+				freq = self.freq_dict[freq_str]
+				
+				# Calculate features for the current slice
+				result = tsfeatures(panel, freq=freq, threads=self.threads, features=self.features)
+				all_results.append(result)
+
+				# Update progress bar
+				pbar.update(end_idx - start_idx)
+
+		# Concatenate all results into a single DataFrame
+		final_result = pd.concat(all_results, ignore_index=True)
 
 		# Save features to disk
 		if is_save:
-			result.to_csv(env.LOTSA_V1_PATH / "features" / f"{dataset_name}_tsf.csv", index=True)
+			# folder not exist, create it
+			if not tsf_path.exists():
+				tsf_path.mkdir(parents=True)
+
+			final_result.to_csv(tsf_path / f"{dataset_name}_tsf.csv", index=True)
 		
-		return result
+		return final_result
 
 # Example usage
 # Assuming `dataset` is a HuggingFace dataset with the specified format
@@ -111,10 +133,13 @@ class TSFeature:
 
 # some code to test the class
 if __name__ == '__main__':
-	# # Example dataset
-	import datasets
-	from uni2ts.common.env import env
 	
+	parser = argparse.ArgumentParser(description="Calculate time series features for given datasets.")
+	parser.add_argument("dataset_names", type=str, nargs='+', help="Names of the datasets to process")
+	args = parser.parse_args()
+	print(f"Processing datasets: {args.dataset_names}")
+
+	# # Example dataset
 	# # dataset = datasets.load_from_disk(str(env.LOTSA_V1_PATH / "bdg-2_fox")).with_format("numpy")
 	# dataset = datasets.load_from_disk(str(env.LOTSA_V1_PATH / "PEMS04")).with_format("numpy")
 	# # panel = TSFeature.hf_dataset_to_panel(dataset)
@@ -139,14 +164,188 @@ if __name__ == '__main__':
 		SubseasonalDatasetBuilder.dataset_list
 	)
 
-	for dataset in dataset_list:
+	if args.dataset_names[0] == "all":
+		args.dataset_names = dataset_list
+
+	for dataset in args.dataset_names:
+		assert dataset in dataset_list, f"Dataset {dataset} not found in the list of available datasets."
+
 		print(f"Processing dataset: {dataset}")
-		dataset = datasets.load_from_disk(str(env.LOTSA_V1_PATH / dataset)).with_format("numpy")
+		ts_data = datasets.load_from_disk(str(env.LOTSA_V1_PATH / dataset)).with_format("numpy")
 		ts_feat = TSFeature()
-		try:
-			ts_feat.calculate_features(dataset, is_save=True, dataset_name=dataset)
-		except Exception as e:
-			print(f"Error in dataset: {dataset}")
-			print(e)
-			continue
-		
+		# try:
+		ts_feat.calculate_features(ts_data, is_save=True, dataset_name=dataset)
+		# except Exception as e:
+			# print(f"Error processing dataset {dataset}: {e}")
+	
+	# dataset can be any of the following datasets
+	# ['buildings_900k',
+	# 'sceaux',
+	# 'borealis',
+	# 'ideal',
+	# 'bdg-2_panther',
+	# 'bdg-2_fox',
+	# 'bdg-2_rat',
+	# 'bdg-2_bear',
+	# 'smart',
+	# 'lcl',
+	# 'azure_vm_traces_2017',
+	# 'borg_cluster_data_2011',
+	# 'alibaba_cluster_trace_2018',
+	# 'cmip6_1850',
+	# 'cmip6_1855',
+	# 'cmip6_1860',
+	# 'cmip6_1865',
+	# 'cmip6_1870',
+	# 'cmip6_1875',
+	# 'cmip6_1880',
+	# 'cmip6_1885',
+	# 'cmip6_1890',
+	# 'cmip6_1895',
+	# 'cmip6_1900',
+	# 'cmip6_1905',
+	# 'cmip6_1910',
+	# 'cmip6_1915',
+	# 'cmip6_1920',
+	# 'cmip6_1925',
+	# 'cmip6_1930',
+	# 'cmip6_1935',
+	# 'cmip6_1940',
+	# 'cmip6_1945',
+	# 'cmip6_1950',
+	# 'cmip6_1955',
+	# 'cmip6_1960',
+	# 'cmip6_1965',
+	# 'cmip6_1970',
+	# 'cmip6_1975',
+	# 'cmip6_1980',
+	# 'cmip6_1985',
+	# 'cmip6_1990',
+	# 'cmip6_1995',
+	# 'cmip6_2000',
+	# 'cmip6_2005',
+	# 'cmip6_2010',
+	# 'era5_1989',
+	# 'era5_1990',
+	# 'era5_1991',
+	# 'era5_1992',
+	# 'era5_1993',
+	# 'era5_1994',
+	# 'era5_1995',
+	# 'era5_1996',
+	# 'era5_1997',
+	# 'era5_1998',
+	# 'era5_1999',
+	# 'era5_2000',
+	# 'era5_2001',
+	# 'era5_2002',
+	# 'era5_2003',
+	# 'era5_2004',
+	# 'era5_2005',
+	# 'era5_2006',
+	# 'era5_2007',
+	# 'era5_2008',
+	# 'era5_2009',
+	# 'era5_2010',
+	# 'era5_2011',
+	# 'era5_2012',
+	# 'era5_2013',
+	# 'era5_2014',
+	# 'era5_2015',
+	# 'era5_2016',
+	# 'era5_2017',
+	# 'era5_2018',
+	# 'taxi_30min',
+	# 'uber_tlc_daily',
+	# 'uber_tlc_hourly',
+	# 'wiki-rolling_nips',
+	# 'london_smart_meters_with_missing',
+	# 'wind_farms_with_missing',
+	# 'wind_power',
+	# 'solar_power',
+	# 'oikolab_weather',
+	# 'elecdemand',
+	# 'covid_mobility',
+	# 'kaggle_web_traffic_weekly',
+	# 'extended_web_traffic_with_missing',
+	# 'm5',
+	# 'm4_yearly',
+	# 'm1_yearly',
+	# 'm1_quarterly',
+	# 'monash_m3_yearly',
+	# 'monash_m3_quarterly',
+	# 'tourism_yearly',
+	# 'm4_hourly',
+	# 'm4_daily',
+	# 'm4_weekly',
+	# 'm4_monthly',
+	# 'm4_quarterly',
+	# 'm1_monthly',
+	# 'monash_m3_monthly',
+	# 'monash_m3_other',
+	# 'nn5_daily_with_missing',
+	# 'nn5_weekly',
+	# 'tourism_monthly',
+	# 'tourism_quarterly',
+	# 'cif_2016_6',
+	# 'cif_2016_12',
+	# 'traffic_hourly',
+	# 'traffic_weekly',
+	# 'australian_electricity_demand',
+	# 'rideshare_with_missing',
+	# 'saugeenday',
+	# 'sunspot_with_missing',
+	# 'temperature_rain_with_missing',
+	# 'vehicle_trips_with_missing',
+	# 'weather',
+	# 'car_parts_with_missing',
+	# 'fred_md',
+	# 'pedestrian_counts',
+	# 'hospital',
+	# 'covid_deaths',
+	# 'kdd_cup_2018_with_missing',
+	# 'bitcoin_with_missing',
+	# 'us_births',
+	# 'largest_2017',
+	# 'largest_2018',
+	# 'largest_2019',
+	# 'largest_2020',
+	# 'largest_2021',
+	# 'BEIJING_SUBWAY_30MIN',
+	# 'HZMETRO',
+	# 'LOOP_SEATTLE',
+	# 'LOS_LOOP',
+	# 'M_DENSE',
+	# 'PEMS03',
+	# 'PEMS04',
+	# 'PEMS07',
+	# 'PEMS08',
+	# 'PEMS_BAY',
+	# 'Q-TRAFFIC',
+	# 'SHMETRO',
+	# 'SZ_TAXI',
+	# 'kdd2022',
+	# 'godaddy',
+	# 'favorita_sales',
+	# 'favorita_transactions',
+	# 'restaurant',
+	# 'hierarchical_sales',
+	# 'china_air_quality',
+	# 'beijing_air_quality',
+	# 'residential_load_power',
+	# 'residential_pv_power',
+	# 'cdc_fluview_ilinet',
+	# 'cdc_fluview_who_nrevss',
+	# 'project_tycho',
+	# 'gfc12_load',
+	# 'gfc14_load',
+	# 'gfc17_load',
+	# 'spain',
+	# 'pdb',
+	# 'elf',
+	# 'bull',
+	# 'cockatoo',
+	# 'hog',
+	# 'covid19_energy',
+	# 'subseasonal',
+	# 'subseasonal_precip']
