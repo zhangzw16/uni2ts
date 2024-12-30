@@ -24,7 +24,6 @@ from .largest import LargeSTDatasetBuilder
 from .lib_city import LibCityDatasetBuilder
 from .others import OthersLOTSADatasetBuilder
 from .proenfo import ProEnFoDatasetBuilder
-from .proenfo2 import ProEnFo2DatasetBuilder
 from .subseasonal import SubseasonalDatasetBuilder
 
 __all__ = [
@@ -40,6 +39,5 @@ __all__ = [
     "LibCityDatasetBuilder",
     "OthersLOTSADatasetBuilder",
     "ProEnFoDatasetBuilder",
-    "ProEnFo2DatasetBuilder",
     "SubseasonalDatasetBuilder",
 ]
