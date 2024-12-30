@@ -1,0 +1,18 @@
+# - _target_: uni2ts.data.builder.ConcatDatasetBuilder
+#   _args_:
+- _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+  dataset: sceaux
+  offset: -7777
+  windows: 1
+  distance: 192
+  prediction_length: 192
+  context_length: -7777
+  patch_size: 32
+- _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+  dataset: bdg-2_bear
+  offset: -7777
+  windows: 1
+  distance: 192
+  prediction_length: 192
+  context_length: -7777
+  patch_size: 32

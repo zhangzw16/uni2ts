@@ -18,7 +18,7 @@ from .crop import EvalCrop, PatchCrop
 from .feature import AddObservedMask, AddTimeIndex, AddVariateIndex
 from .field import LambdaSetFieldIfNotPresent, RemoveFields, SelectFields, SetValue
 from .imputation import DummyValueImputation, ImputeTimeSeries, LastValueImputation
-from .pad import EvalPad, Pad, PadFreq
+from .pad import EvalPad, Pad, PadFreq, EvalPadv2
 from .patch import (
     DefaultPatchSizeConstraints,
     FixedPatchSizeConstraints,
@@ -26,7 +26,7 @@ from .patch import (
     Patchify,
     PatchSizeConstraints,
 )
-from .resample import SampleDimension
+from .resample import SampleDimension, EvalSampleDimension
 from .reshape import (
     FlatPackCollection,
     FlatPackFields,
@@ -47,6 +47,7 @@ __all__ = [
     "EvalCrop",
     "EvalMaskedPrediction",
     "EvalPad",
+    "EvalPadv2",
     "ExtendMask",
     "FixedPatchSizeConstraints",
     "FlatPackCollection",
@@ -67,6 +68,7 @@ __all__ = [
     "RemoveFields",
     "SampleDimension",
     "SelectFields",
+    "EvalSampleDimension",
     "SequencifyField",
     "SetValue",
     "Transformation",

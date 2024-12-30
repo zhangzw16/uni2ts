@@ -1,0 +1,679 @@
+# - _target_: uni2ts.data.builder.ConcatDatasetBuilder
+#   datasets:
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: buildings_900k
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+
+- _target_: uni2ts.data.builder.ConcatDatasetBuilder
+  _args_:
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: sceaux # 1
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: borealis # 15
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: ideal # 219
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: bdg-2_panther
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: bdg-2_fox
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: bdg-2_rat
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: bdg-2_bear
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: smart
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: lcl
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+
+# CloudOps
+- _target_: uni2ts.data.builder.ConcatDatasetBuilder
+  _args_:
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: azure_vm_traces_2017
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: borg_cluster_data_2011
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 192
+    #   prediction_length: 192
+    #   context_length: -7777
+    #   patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: alibaba_cluster_trace_2018
+      offset: -7777
+      windows: 1
+      distance: 96
+      prediction_length: 96
+      context_length: -7777
+      patch_size: 32
+
+# ClimateLearn
+# CMIP6: cmip6_1850, cmip6_1875, cmip6_1900, cmip6_1925, cmip6_1950, cmip6_1975, cmip6_2000
+# ERA5: era5_1989, era5_1994, era5_1999, era5_2004, era5_2009
+- _target_: uni2ts.data.builder.ConcatDatasetBuilder
+  _args_:
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: cmip6_1850
+      offset: -7777
+      windows: 1
+      distance: 96
+      prediction_length: 96
+      context_length: -7777
+      patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: cmip6_1875
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 192
+    #   prediction_length: 192
+    #   context_length: -7777
+    #   patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: cmip6_1900
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 192
+    #   prediction_length: 192
+    #   context_length: -7777
+    #   patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: cmip6_1925
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 192
+    #   prediction_length: 192
+    #   context_length: -7777
+    #   patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: cmip6_1950
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 192
+    #   prediction_length: 192
+    #   context_length: -7777
+    #   patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: cmip6_1975
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 192
+    #   prediction_length: 192
+    #   context_length: -7777
+    #   patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: cmip6_2000
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 192
+    #   prediction_length: 192
+    #   context_length: -7777
+    #   patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: era5_1989
+      offset: -7777
+      windows: 1
+      distance: 96
+      prediction_length: 96
+      context_length: -7777
+      patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: era5_1994
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 192
+    #   prediction_length: 192
+    #   context_length: -7777
+    #   patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: era5_1999
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 192
+    #   prediction_length: 192
+    #   context_length: -7777
+    #   patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: era5_2004
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 192
+    #   prediction_length: 192
+    #   context_length: -7777
+    #   patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: era5_2009
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 192
+    #   prediction_length: 192
+    #   context_length: -7777
+    #   patch_size: 32
+
+# Monashs
+- _target_: uni2ts.data.builder.ConcatDatasetBuilder
+  _args_:
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: m1_monthly # 617
+      offset: -7777
+      windows: 1
+      distance: 18
+      prediction_length: 18
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: vehicle_trips_with_missing # 329
+      offset: -7777
+      windows: 1
+      distance: 30
+      prediction_length: 30
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: nn5_weekly # 111
+      offset: -7777
+      windows: 1
+      distance: 8
+      prediction_length: 8
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: tourism_monthly
+      offset: -7777
+      windows: 1
+      distance: 24
+      prediction_length: 24
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: monash_m3_other
+      offset: -7777
+      windows: 1
+      distance: 8
+      prediction_length: 8
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: cif_2016_12
+      offset: -7777
+      windows: 1
+      distance: 12
+      prediction_length: 12
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: us_births
+      offset: -7777
+      windows: 1
+      distance: 30
+      prediction_length: 30
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: sunspot_with_missing
+      offset: -7777
+      windows: 1
+      distance: 30
+      prediction_length: 30
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: hospital
+      offset: -7777
+      windows: 1
+      distance: 12
+      prediction_length: 12
+      context_length: -7777
+      patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: kdd_cup_2018_with_missing
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 168
+    #   prediction_length: 168
+    #   context_length: -7777
+    #   patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: pedestrian_counts
+      offset: -7777
+      windows: 1
+      distance: 24
+      prediction_length: 24
+      context_length: -7777
+      patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: m4_quarterly
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 8
+    #   prediction_length: 8
+    #   context_length: -7777
+    #   patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: m4_hourly
+      offset: -7777
+      windows: 1
+      distance: 48
+      prediction_length: 48
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: covid_deaths
+      offset: -7777
+      windows: 1
+      distance: 30
+      prediction_length: 30
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: m4_weekly
+      offset: -7777
+      windows: 1
+      distance: 13
+      prediction_length: 13
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: weather
+      offset: -7777
+      windows: 1
+      distance: 30
+      prediction_length: 30
+      context_length: -7777
+      patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: rideshare_with_missing
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 168
+    #   prediction_length: 168
+    #   context_length: -7777
+    #   patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: cif_2016_6
+      offset: -7777
+      windows: 1
+      distance: 6
+      prediction_length: 6
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: fred_md
+      offset: -7777
+      windows: 1
+      distance: 12
+      prediction_length: 12
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: nn5_daily_with_missing
+      offset: -7777
+      windows: 1
+      distance: 56
+      prediction_length: 56
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: tourism_quarterly
+      offset: -7777
+      windows: 1
+      distance: 8
+      prediction_length: 8
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: monash_m3_monthly
+      offset: -7777
+      windows: 1
+      distance: 18
+      prediction_length: 18
+      context_length: -7777
+      patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: traffic_hourly
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 168
+    #   prediction_length: 168
+    #   context_length: -7777
+    #   patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: bitcoin_with_missing
+      offset: -7777
+      windows: 1
+      distance: 30
+      prediction_length: 30
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: saugeenday
+      offset: -7777
+      windows: 1
+      distance: 30
+      prediction_length: 30
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: car_parts_with_missing
+      offset: -7777
+      windows: 1
+      distance: 12
+      prediction_length: 12
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: m4_daily
+      offset: -7777
+      windows: 1
+      distance: 14
+      prediction_length: 14
+      context_length: -7777
+      patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: m4_monthly # 48000
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 18
+    #   prediction_length: 18
+    #   context_length: -7777
+    #   patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: temperature_rain_with_missing # 32072
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 30
+    #   prediction_length: 30
+    #   context_length: -7777
+    #   patch_size: 32
+
+# # LargeST
+# - _target_: uni2ts.data.builder.ConcatDatasetBuilder
+#   _args_:
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: largest_2017
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+
+# LibCity, spatio-temporal
+- _target_: uni2ts.data.builder.ConcatDatasetBuilder
+  _args_:
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: HZMETRO
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: PEMS03
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: PEMS04
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: SZ_TAXI
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+
+# ProEnFo
+- _target_: uni2ts.data.builder.ConcatDatasetBuilder
+  _args_:
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: gfc12_load
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+    # - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+    #   dataset: gfc14_load
+    #   offset: -7777
+    #   windows: 1
+    #   distance: 192
+    #   prediction_length: 192
+    #   context_length: -7777
+    #   patch_size: 32
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: gfc17_load
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: spain
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: pdb
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: elf
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: bull
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: cockatoo
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: hog
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: covid19_energy
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+
+# Climate
+- _target_: uni2ts.data.builder.ConcatDatasetBuilder
+  _args_:
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: subseasonal
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+
+# Others
+- _target_: uni2ts.data.builder.ConcatDatasetBuilder
+  _args_:
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: kdd2022
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: godaddy
+      offset: -7777
+      windows: 1
+      distance: 6
+      prediction_length: 6
+      context_length: -7777
+      patch_size: 32
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: favorita_transactions
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: restaurant
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: hierarchical_sales
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: china_air_quality
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+    - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+      dataset: beijing_air_quality
+      offset: -7777
+      windows: 1
+      distance: 192
+      prediction_length: 192
+      context_length: -7777
+      patch_size: 32
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: cdc_fluview_ilinet
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: cdc_fluview_who_nrevss
+#       offset: -7777
+#       windows: 1
+#       distance: 1s92
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32
+#     - _target_: uni2ts.data.builder.simple.SimpleEvalDatasetBuilder
+#       dataset: project_tycho
+#       offset: -7777
+#       windows: 1
+#       distance: 192
+#       prediction_length: 192
+#       context_length: -7777
+#       patch_size: 32

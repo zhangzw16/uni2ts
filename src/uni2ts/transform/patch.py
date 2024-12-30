@@ -88,7 +88,7 @@ class GetPatchSize(Transformation):
         # largest patch size based on min_time_patches
         target: list[UnivarTimeSeries] = data_entry[self.target_field]
         length = target[0].shape[0]
-        patch_size_ceil = length // self.min_time_patches
+        patch_size_ceil = float('inf') if self.min_time_patches == 0 else length // self.min_time_patches
 
         if isinstance(self.patch_sizes, (tuple, list)):
             patch_size_candidates = [

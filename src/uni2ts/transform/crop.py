@@ -53,7 +53,10 @@ class PatchCrop(MapFuncMixin, Transformation):
 
     def __call__(self, data_entry: dict[str, Any]) -> dict[str, Any]:
         a, b = self._get_boundaries(data_entry)
-        sc.sample_counter.update_crop(a, b)
+        try:
+            sc.sample_counter.update_crop(a, b)
+        except AttributeError:
+            pass
         self.map_func(
             partial(self._crop, a=a, b=b),  # noqa
             data_entry,
@@ -134,6 +137,16 @@ class EvalCrop(MapFuncMixin, Transformation):
     def _get_boundaries(self, data_entry: dict[str, Any]) -> tuple[int, int]:
         field: list[UnivarTimeSeries] = data_entry[self.fields[0]]
         time = field[0].shape[0]
+
+        # from tsfm scaling laws: 
+        if self.context_length == -7777:
+            if time <= 512 + self.prediction_length:
+                a, b = 0, time  # 如果序列较短,就用全部数据
+            else:
+                a = 0
+                b = a + 512 + self.prediction_length  # 如果序列较长,就取前1000+prediction_length个点
+            return a, b
+
         window = data_entry["window"]
         fcst_start = self.offset + window * self.distance
         a = fcst_start - self.context_length

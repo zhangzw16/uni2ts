@@ -13,9 +13,11 @@
             "justMyCode": false,
             "args": [
                 "-cp", "conf/pretrain",
+                "--config-name", "default_val.yaml",
                 "run_name=debug",
                 "model=moirai_small",
-                "data=buildings_bench",
+                "data=lotsa_v1_weighted_debug",
+                "val_data=lotsa_v1_all"
             ],
         },
         {

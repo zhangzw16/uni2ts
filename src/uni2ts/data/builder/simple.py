@@ -284,7 +284,8 @@ class SimpleEvalDatasetBuilder(DatasetBuilder):
             HuggingFaceDatasetIndexer(
                 datasets.load_from_disk(
                     str(self.storage_path / self.dataset),
-                )
+                ),
+                dataset_name=self.dataset,
             ),
             transform=transform_map[self.dataset](
                 offset=self.offset,

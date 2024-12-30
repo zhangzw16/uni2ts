@@ -142,7 +142,10 @@ class TimeSeriesDataset(Dataset):
             shape = samples['target'].shape
         else:
             shape = (samples['target'][0].shape[0],)
-        sc.sample_counter.record_candidate_variables(dataset_name, samples['item_id'], shape)
+        try:
+            sc.sample_counter.record_candidate_variables(dataset_name, samples['item_id'], shape)
+        except Exception as e:
+            pass
 
     def __len__(self) -> int:
         """
@@ -263,7 +266,7 @@ class EvalDataset(TimeSeriesDataset):
             indexer,
             transform,
             SampleTimeSeriesType.NONE,
-            dataset_weight=windows,
+            dataset_weight=windows, # repeat the dataset `windows` times
         )
 
     def _get_data(self, idx: int) -> dict[str, Data]:

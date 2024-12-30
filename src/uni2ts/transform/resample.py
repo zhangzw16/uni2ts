@@ -65,7 +65,55 @@ class SampleDimension(
         n = self.sampler(min(len(arr), field_max_dim))
         selected_vars = [arr[idx] for idx in rand_idx[:n]]
         if field == "target":
-            sc.sample_counter.update_selected_vars(rand_idx[:n])
+            try:
+                sc.sample_counter.update_selected_vars(rand_idx[:n])
+            except AttributeError:
+                pass
+        return selected_vars
+
+
+@dataclass
+class EvalSampleDimension(
+    CheckArrNDimMixin, CollectFuncMixin, MapFuncMixin, Transformation
+):
+    max_dim: int
+    fields: tuple[str, ...]
+    optional_fields: tuple[str, ...] = tuple()
+    sampler: Sampler = get_sampler("uniform")
+
+    def __call__(self, data_entry: dict[str, Any]) -> dict[str, Any]:
+        total_field_dim = sum(
+            self.collect_func_list(
+                self._get_dim,
+                data_entry,
+                self.fields,
+                optional_fields=self.optional_fields,
+            )
+        )
+        self.map_func(
+            partial(self._process, total_field_dim=total_field_dim),  # noqa
+            data_entry,
+            self.fields,
+            optional_fields=self.optional_fields,
+        )
+        return data_entry
+
+    def _get_dim(self, data_entry: dict[str, Any], field: str) -> int:
+        self.check_ndim(field, data_entry[field], 2)
+        return len(data_entry[field])
+
+    def _process(
+        self, data_entry: dict[str, Any], field: str, total_field_dim: int
+    ) -> list[UnivarTimeSeries]:
+        arr: list[UnivarTimeSeries] = data_entry[field]
+        field_max_dim = (self.max_dim * len(arr)) // total_field_dim
+        n = min(len(arr), field_max_dim)
+        selected_vars = arr[:n]
+        if field == "target":
+            try:
+                sc.sample_counter.update_selected_vars(range(n))
+            except AttributeError:
+                pass
         return selected_vars
 
 
